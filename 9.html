@@ -1,0 +1,155 @@
+<html>
+<head>
+    <script>
+        var cs = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
+        var c = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
+        var p = [[],[],[],[]];
+
+        var hero = {
+            '1-1' : 'knight',
+            '1-2' : 'barbarian',
+            '1-3' : 'wyrmtamer',
+            '2-1' : 'assassin',
+            '2-2' : 'huntress',
+            '2-3' : 'gunslinger',
+            '3-1' : 'sorceress',
+            '3-2' : 'druid',
+            '3-3' : 'necromancer',
+
+        }
+
+        var m = 2;
+
+        var r = 0;
+
+        var h = "";
+
+        var ai = [1,1,1,1];
+
+        var user = ['player 1','player 2','player 3','player 4'];
+
+        start();
+
+
+        function start(){
+
+            p = [[],[],[],[]];
+            r = 0;
+
+            shuffle(c);
+
+            deal(m);
+
+            turn();
+        }
+
+        function turn(){
+            r++;
+            console.log("round " + (r));
+
+            var u = (r-1)%m;
+
+            console.log(user[u] + "'s turn")
+
+            if (ai[u]){
+                aiturn(u);
+            }
+        }
+
+        function aiturn(u){
+            var e = h;
+
+            if (r == 0){ //just play first one
+                play(u,0);
+            } else {
+                var playable = contend(h);
+                for (var i = 0; i < p[u].length; i++){
+                    if (playable.indexOf(p[u][i]) >= 0){
+                        play(u,i);
+                        break;
+                    }
+                    // console.log("looping")
+                }
+            }
+
+            if (e == h){
+                console.log("none of your card can defeat it... you lose");
+                return;
+            }
+
+            console.log(user[u] + " plays " + hero[h])
+            // console.log(p[u]);
+
+            turn();
+        }
+
+        function play(u,c){
+            h = p[u].splice(c,1)[0];
+        }
+
+
+
+
+        function shuffle(array) {
+            console.log("shuffle")
+
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+
+        function deal(n){
+            console.log("deal cards to " + m + " players")
+
+            for(i=0; i<c.length-1; i+=n){
+                for(j=0; j<n; j++){
+                    p[j].push(c[i+j]);
+                }
+            }
+        }
+
+        function contend(def){
+            var playable = [];
+            for(i =0;i<c.length;i++){
+                if (cs[i] != def) {
+                    if (rps2(cs[i], def)) {
+                        // console.log(c[i] + " VS " + def + " == " + rps2(cs[i], def))
+                        playable.push(cs[i]);
+                    }
+                }
+            }
+            return playable;
+        }
+
+        function rps3(a,d){
+            var atk = a.split("-");
+            var def = d.split("-");
+
+            return rps(atk[0],def[0]) || rps(atk[1],def[1])
+        }
+
+        function rps2(a,d){
+            var atk = a.split("-");
+            var def = d.split("-");
+
+            if (atk[0] != def[0])
+                return rps(atk[0],def[0])
+            else
+                return rps(atk[1],def[1])
+        }
+
+        function rps(a, d){
+            if ((d%3)+1 == a)
+                return true;
+            return false;
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>
