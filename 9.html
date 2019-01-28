@@ -1,19 +1,35 @@
 <html>
 <head>
+
+    <style>.gray{color:gray}</style>
+</head>
+<body>
+
+    <p id="gamelog">
+        
+    </p>
+
+    <div class="choices" id="choices">
+        <a href="#">card 1</a>
+        <a href="#">card 2</a>
+        <a href="#">card 3</a>
+        <a href="#">card 4</a>
+    </div>
+
     <script>
         var cs = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
         var c = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','3-3'];
         var p = [[],[],[],[]];
 
         var hero = {
-            '1-1' : 'knight',
-            '1-2' : 'barbarian',
+            '1-1' : 'paladin',
+            '1-2' : 'viking',
             '1-3' : 'wyrmtamer',
             '2-1' : 'assassin',
             '2-2' : 'huntress',
             '2-3' : 'gunslinger',
             '3-1' : 'sorceress',
-            '3-2' : 'druid',
+            '3-2' : 'alchemists',
             '3-3' : 'necromancer',
 
         }
@@ -24,17 +40,30 @@
 
         var h = "";
 
+        var winner = "";
+
         var ai = [1,1,1,1];
 
         var user = ['player 1','player 2','player 3','player 4'];
 
         start();
 
+        function log(txt){
+            console.log(txt);
+            document.getElementById("gamelog").innerHTML += txt + "</br>";
+        }
+
+        function clearLog(){
+            document.getElementById("gamelog").innerHTML = "";
+        }
+
 
         function start(){
 
             p = [[],[],[],[]];
             r = 0;
+
+            clearLog();
 
             shuffle(c);
 
@@ -45,15 +74,46 @@
 
         function turn(){
             r++;
-            console.log("round " + (r));
+            log("round " + (r));
 
             var u = (r-1)%m;
 
-            console.log(user[u] + "'s turn")
+            log(user[u] + "'s turn")
 
             if (ai[u]){
                 aiturn(u);
+            } else {
+                chooseCard(u);
             }
+        }
+
+        function chooseCard(u){
+            document.getElementById("choices").innerHTML = "";
+            if (h == ""){ // all cards are playable in turn one
+                for (var i = 0; i < p[u].length; i++){
+                    var a =  "<a href='#' onclick='play(" + [u] +  "," +  [i] + ")'>"+ hero[p[u][i]] +"</a></br>"
+                    document.getElementById("choices").innerHTML += a;
+                }
+            } else {
+                var playable = contend(h);
+                var winnable = false
+                for (var i = 0; i < p[u].length; i++){
+                    if (playable.indexOf(p[u][i]) >= 0){
+                        var a =  "<a href='#' onclick='play(" + [u] +  "," +  [i] + ")'>"+ hero[p[u][i]] +"</a></br>"
+                        document.getElementById("choices").innerHTML += a;
+                        winnable = true;
+                    } else {
+                        var a =  "<a class='gray'>"+ hero[p[u][i]] +"</a></br>"
+                        document.getElementById("choices").innerHTML += a;
+                    }
+                }
+
+                if (!winnable){
+                    log("none of your card can defeat it... you lose");
+                    return;
+                }
+            }
+
         }
 
         function aiturn(u){
@@ -68,30 +128,31 @@
                         play(u,i);
                         break;
                     }
-                    // console.log("looping")
+                    // log("looping")
                 }
             }
 
             if (e == h){
-                console.log("none of your card can defeat it... you lose");
+                log("none of your card can defeat it... you lose");
                 return;
             }
 
-            console.log(user[u] + " plays " + hero[h])
-            // console.log(p[u]);
 
-            turn();
+            // log(p[u]);
+
         }
 
         function play(u,c){
             h = p[u].splice(c,1)[0];
+            log(user[u] + " plays " + hero[h])
+            turn();
         }
 
 
 
 
         function shuffle(array) {
-            console.log("shuffle")
+            log("shuffle")
 
             for (var i = array.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
@@ -103,7 +164,7 @@
 
 
         function deal(n){
-            console.log("deal cards to " + m + " players")
+            log("deal cards to " + m + " players")
 
             for(i=0; i<c.length-1; i+=n){
                 for(j=0; j<n; j++){
@@ -117,7 +178,7 @@
             for(i =0;i<c.length;i++){
                 if (cs[i] != def) {
                     if (rps2(cs[i], def)) {
-                        // console.log(c[i] + " VS " + def + " == " + rps2(cs[i], def))
+                        // log(c[i] + " VS " + def + " == " + rps2(cs[i], def))
                         playable.push(cs[i]);
                     }
                 }
@@ -148,8 +209,6 @@
             return false;
         }
     </script>
-</head>
-<body>
 
 </body>
 </html>
