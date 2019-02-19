@@ -87,12 +87,10 @@ def run_bot(reddit):
                     price = "Item:**" + item['name'] + "** \n\n SEA:" + fmt(item['sea']['latest']) + " \n\n Global:" + fmt(item['global']['latest']);
                     c.reply(price)
                     print(price)
-
                     comment_replied_to.append(id)
                 else:
                     c.reply("Item not found")
                     print("not found")
-
                     comment_replied_to.append(id)
 
 
