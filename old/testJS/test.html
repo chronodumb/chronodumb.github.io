@@ -1,0 +1,128 @@
+<html>
+<head>
+</head>
+<body>
+
+<script>
+    var book = {
+        "id" : "",
+        "title" : "",
+        "desc" : "",
+        "author" : "",
+        "cover" : "",
+        "pages" : [],
+        "bgm": "",
+        "css": "",
+        "js" : "",
+    }
+
+    var page = {
+        "id" : "1",
+        "title" : "xx",
+        "content" : "xxx",
+        "opt" : ["aaaa","bbbb","cccc"],
+        "path": ["1","2","3"],
+        "img": "",
+        "bgm": "",
+        "css": "",
+        "js" : "",
+    }
+
+    console.log(page);
+
+    function WordCount(str) {
+        return str.split(" ").length;
+    }
+
+    function play(url) {
+        new Audio(url).play();
+    }
+
+    function count(box){
+        console.log("counting");
+        document.getElementById('ctr').innerHTML=box.value.length;
+    }
+
+    function save(){
+        console.log(inform.opt[0].value + "," + inform.opt[1].value + "," + inform.opt);
+    }
+
+    function addOpt(){
+        var o = document.createElement('input');
+        o.type = "text";
+        o.name = "opt";
+        optrow.appendChild(o);
+
+        var p = document.createElement('input');
+        p.type = "text";
+        p.name = "path";
+        pathrow.append(p);
+    }
+
+    function delOpt(){
+        var last = optrow.children.length - 1;
+        optrow.children[last].remove();
+        pathrow.children[last].remove();
+    }
+
+    function loadBook(){
+
+    }
+</script>
+
+test
+
+<form name="inform" id="inform">
+    <table>
+        <colgroup>
+            <col width="100px;">
+            <col>
+        </colgroup>
+        <tr>
+            <td>id</td>
+            <td><input type="text" name="id" value=""></td>
+        </tr>
+        <tr>
+            <td>title</td>
+            <td><input type="text" name="title" value=""></td>
+        </tr>
+        <tr>
+            <td>content (<span id="ctr">0</span>)</td>
+            <td><textarea name="content" onkeyup="count(this)" maxlength="1024"></textarea></td>
+        </tr>
+        <tr>
+            <td>opt <input type="button" value="+" onclick="addOpt()"><input type="button" value="-" onclick="delOpt()"></td>
+            <td id="optrow"><input type="text" name="opt" value=""></td>
+        </tr>
+        <tr>
+            <td>path</td>
+            <td id="pathrow"><input type="text" name="path" value=""></td>
+        </tr>
+        <tr>
+            <td>img</td>
+            <td><input type="text" name="img" value=""></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="button" value="preview" onclick="preview()"/>
+                <input type="button" value="save" onclick="save()"/>
+            </td>
+        </tr>
+    </table>
+</form>
+
+
+
+<br/>
+<br/>
+
+<div>
+    <p>Test test test test</p>
+    <a href="#" onclick="jump(1)">1111</a><br/>
+    <a href="#" onclick="jump(2)">2222</a><br/>
+    <a href="#" onclick="jump(3)">3333</a><br/>
+</div>
+
+</body>
+</html>

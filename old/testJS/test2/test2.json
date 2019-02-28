@@ -1,0 +1,27 @@
+{
+  "id" : "",
+  "details" :
+  {
+    "title" : "",
+    "desc" : "",
+    "thumb" : "",
+    "genre" : "",
+    "length" : "",
+    "rating" : ""
+  },
+  "char" :
+  [
+    {
+      "id":"",
+      "name":"",
+      "st":[],
+      "img":[]
+    }
+  ],
+  "vars" :        //custom variable to track certain user choices, intantiate it on startup in localStorage perhaps?
+  [
+    ["name",""],
+    ["item",""]
+  ],
+  "" : ""
+}

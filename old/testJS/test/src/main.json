@@ -1,0 +1,34 @@
+{
+  "id" : "",
+  "details" :
+  {
+    "title" : "",
+    "desc" : "",
+    "thumb" : "",
+    "genre" : "",
+    "length" : "",
+    "rating" : ""
+  },
+  "pages" :
+  [
+    {
+      "id" : "",
+      "content":"",
+      "opt":[""],
+      "path":[""],
+      "img": "",
+      "bgm": "",
+      "css":""
+    },
+    {
+      "id" : "",
+      "content":"",
+      "opt":["",""],
+      "path":["",""],
+      "img": "",
+      "bgm": "",
+      "css":""
+    }
+  ]
+
+}

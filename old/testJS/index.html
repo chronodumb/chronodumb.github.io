@@ -1,0 +1,79 @@
+<html>
+<head>
+    <script>
+        var q = [
+            {
+                "id": "p1",
+                "a": "20",
+                "s": "10"
+            },
+            {
+                "id": "p2",
+                "a": "18",
+                "s": "12"
+            },
+            {
+                "id": "p3",
+                "a": "15",
+                "s": "15"
+            },
+            {
+                "id": "p4",
+                "a": "12",
+                "s": "18"
+            },
+            {
+                "id": "p5",
+                "a": "10",
+                "s": "20"
+            },
+            {
+                "id": "p6",
+                "a": "0",
+                "s": "0"
+            },
+        ];
+
+        q = q.sort(function (a,b){
+            return parseInt(b.s) - parseInt(a.s);
+        });
+
+        for (var i = 0; i < q.length; i++){
+            console.log(q[i].id);
+        }
+
+        var turn = [0, 0, 0, 0, 0, 0];
+        var total = [0, 0, 0, 0, 0, 0];
+
+        for (var i = 0 ; i < 50 ; i++) {
+            getTurn();
+           console.log( "turn" + i + " : " + getTurn().id);
+        }
+
+        for (var i = 0 ; i <6; i++){
+            console.log( q[i].id + " == " + total[i] + " == " + total[i] * parseInt(q[i].a) );
+        }
+
+        function getTurn() {
+            while (true) {
+                for (var i = 0; i < turn.length; i++) {
+                    if (turn[i] >= 100) {
+                        turn[i] -= 100;
+                        total[i] ++;
+                        return q[i];
+                    }
+                }
+                for (var i = 0; i < turn.length; i++) {
+                    turn[i] += parseInt(q[i].s);
+                }
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+hello world
+
+</body>
+</html>

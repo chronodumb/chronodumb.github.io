@@ -1,0 +1,27 @@
+{
+  "id" : "",
+  "name" : "",
+  "rarity" : "",
+  "tier" : "",
+  "type" : "",
+  "sub-type":"",
+  "group" : "",
+  "level" : "",
+  "stat":[],
+  "img":"",
+  "effect":[
+    {
+      "type" : "",
+      "value" : ""
+    }
+  ],
+  "bonus":[
+    {
+      "type" : "",
+      "value" : ""
+    }
+  ],
+  "desc":"",
+  "quote":"",
+  "":""
+}
