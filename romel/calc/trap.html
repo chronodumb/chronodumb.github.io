@@ -1,13 +1,122 @@
 <html>
     <head>
         <title>ROMEL-CALC : Trap Damage</title>
+        <style>
+            table {
+                border-collapse: collapse; border-spacing: 0; width:200px; margin:2px;
+            }
+            td, th { border: 1px solid #CCC; padding:5px; font-size:10px; text-align:left}
+            .wrap {
+                display: flex;
+                flex-wrap: wrap;
+                align-items:flex-stretch;
+            }
+        </style>
     </head>
     <body>
         <h5>Trap Damge Calculator</h5>
-        <i>Version 0.01</i>
+        <hr/>
+
+        <div class="wrap">
+            <div>
+                <table>
+                    <tr>
+                        <th colspan="2"> STATS </th>
+                    </tr>
+                    <tr>
+                        <th>Base LV</th><td><input type="text" size="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>Total INT</th><td><input type="text" size="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>Total DEX</th><td><input type="text" size="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>ATK</th><td><input type="text" size="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>Refine ATK</th><td><input type="text" size="5"/></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <table>
+                    <tr>
+                        <th colspan="2"> SKILLS </th>
+                        </th>
+                    <tr>
+                        <th>Claymore</th><td><input type="text" size="5" value="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>Landmine</th><td><input type="text" size="5" value="5"/></td>
+                    </tr>
+                    <tr>
+                        <th>Detonator</th><td><input type="text" size="5" value="3"/></td>
+                    </tr>
+                    <tr>
+                        <th>Trap Mastery</th><td><input type="text" size="5" value="10"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="button" value="Calculate" onclick="calculate()"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
         <hr/>
 
+        <div class="wrap">
+            <div>
+                <table>
+                    <tr>
+                        <th colspan="2"> Result </th>
+                    </tr>
+                    <tr>
+                        <th>Claymore</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Claymore*</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Claymore* x2</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Claymore* x3</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Claymore* x4</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">*With Detonate</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <table>
+                    <tr>
+                        <th colspan="2"> Result </th>
+                    </tr>
+                    <tr>
+                        <th>Landmine</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Landmine*</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>Landmine* x2</th><td><input type="text" size="5" value="5" readonly/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">*With Detonate</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
     </body>
 
 </html>
