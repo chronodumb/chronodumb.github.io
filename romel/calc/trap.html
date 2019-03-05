@@ -12,31 +12,59 @@
                 align-items:flex-stretch;
             }
         </style>
+        <script>
+            function calculate(){
+
+                var u = formSerialize(document.main);
+
+                var claymoreDmg =  (u.dex * (3 + u.level/100) * (1+ u.int/35) * ((u.claymore * 0.5) + 0.4) );
+
+                document.res.claymore.value = Math.floor(claymoreDmg);
+
+
+                var landmineDmg = ( u.dex * (3 + (u.level/100)) * (1 + (u.int/35) ) + ((u.landmine>5) ? (u.atk + u.ref) * (0.05 * u.landmine) : 0) ) * ((((u.landmine > 5) ? 5 : u.landmine) * 1.40) + 0.60)
+
+                document.res.landmine.value = Math.floor(landmineDmg);
+
+            }
+
+            function formSerialize(formElement) {
+                const values = {};
+                const inputs = formElement.elements;
+
+                for (let i = 0; i < inputs.length; i++) {
+                    values[inputs[i].name] = inputs[i].value;
+                }
+                return values;
+            }
+
+
+        </script>
     </head>
     <body>
         <h5>Trap Damge Calculator</h5>
         <hr/>
 
-        <div class="wrap">
+        <form name="main" class="wrap">
             <div>
                 <table>
                     <tr>
                         <th colspan="2"> STATS </th>
                     </tr>
                     <tr>
-                        <th>Base LV</th><td><input type="text" size="5"/></td>
+                        <th>Base LV</th><td><input type="text" size="5" name="level" value="90"/></td>
                     </tr>
                     <tr>
-                        <th>Total INT</th><td><input type="text" size="5"/></td>
+                        <th>Total INT</th><td><input type="text" size="5" name="int" value="133"/></td>
                     </tr>
                     <tr>
-                        <th>Total DEX</th><td><input type="text" size="5"/></td>
+                        <th>Total DEX</th><td><input type="text" size="5" name="dex" value="184"/></td>
                     </tr>
                     <tr>
-                        <th>ATK</th><td><input type="text" size="5"/></td>
+                        <th>ATK</th><td><input type="text" size="5" name="atk" value="1312"/></td>
                     </tr>
                     <tr>
-                        <th>Refine ATK</th><td><input type="text" size="5"/></td>
+                        <th>Refine ATK</th><td><input type="text" size="5" name="ref" value="232"/></td>
                     </tr>
                 </table>
             </div>
@@ -47,16 +75,19 @@
                         <th colspan="2"> SKILLS </th>
                         </th>
                     <tr>
-                        <th>Claymore</th><td><input type="text" size="5" value="5"/></td>
+                        <th>Claymore</th><td><input type="text" size="5" value="5" name="claymore"/></td>
                     </tr>
                     <tr>
-                        <th>Landmine</th><td><input type="text" size="5" value="5"/></td>
+                        <th>Landmine</th><td><input type="text" size="5" value="5" name="landmine"/></td>
                     </tr>
                     <tr>
-                        <th>Detonator</th><td><input type="text" size="5" value="3"/></td>
+                        <th>Detonator</th><td><input type="text" size="5" value="3" name="detonator"/></td>
                     </tr>
                     <tr>
-                        <th>Trap Mastery</th><td><input type="text" size="5" value="10"/></td>
+                        <th>Trap Mastery</th><td><input type="text" size="5" value="10" name="trapmaster"/></td>
+                    </tr>
+                    <tr>
+                        <th>Trump Tamer</th><td><input type="text" size="5" value="0" name="trumptamer"/></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -65,18 +96,19 @@
                     </tr>
                 </table>
             </div>
-        </div>
+
+        </form>
 
         <hr/>
 
-        <div class="wrap">
+        <form name="res" class="wrap">
             <div>
                 <table>
                     <tr>
                         <th colspan="2"> Result </th>
                     </tr>
                     <tr>
-                        <th>Claymore</th><td><input type="text" size="5" value="5" readonly/></td>
+                        <th>Claymore</th><td><input name="claymore" type="text" size="5" value="5" readonly/></td>
                     </tr>
                     <tr>
                         <th>Claymore*</th><td><input type="text" size="5" value="5" readonly/></td>
@@ -102,7 +134,7 @@
                         <th colspan="2"> Result </th>
                     </tr>
                     <tr>
-                        <th>Landmine</th><td><input type="text" size="5" value="5" readonly/></td>
+                        <th>Landmine</th><td><input name="landmine" type="text" size="5" value="5" readonly/></td>
                     </tr>
                     <tr>
                         <th>Landmine*</th><td><input type="text" size="5" value="5" readonly/></td>
@@ -116,7 +148,7 @@
                 </table>
             </div>
 
-        </div>
+        </form>
     </body>
 
 </html>
