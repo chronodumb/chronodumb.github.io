@@ -9,6 +9,11 @@ import json
 import requests
 import time
 
+# Create the Reddit instance
+reddit = praw.Reddit('bot1')
+
+# and login
+#reddit.login(REDDIT_USERNAME, REDDIT_PASS)
 
 # Have we run this code before? If not, create an empty list
 if not os.path.isfile("comment_replied_to.txt"):
@@ -57,6 +62,7 @@ def getAll(r, submissionId, verbose=True):
 def fmt(i):
     return "{:,}".format(i) + "z"
 
+
 def run_bot(reddit):
     #using push api instead
     pushurl = "https://api.pushshift.io/reddit/search/comment/?q=\"price-check\"&sort=desc&size=20&fields=id,body&subreddit=ragnarokmobile"
@@ -73,28 +79,50 @@ def run_bot(reddit):
 
             m = re.search("!price-check (.*)", comment["body"], re.IGNORECASE)
             if (m):
-                print("Bot replying to : ", comment["body"])
 
-                url= "https://www.romexchange.com/api?exact=false&item=" + urllib.quote_plus(m.group(1))
+                cart = "";
+                totalsea = 0;
+                totalglobal = 0;
 
-                print(url)
+                search = m.group(1).split(",")
 
-                contents = urllib2.urlopen(url).read()
-                items = json.loads(contents)
+                for q in search:
 
-                if (len(items)):
-                    item = items[0]
-                    price = "Item:**" + item['name'] + "** \n\n SEA:" + fmt(item['sea']['latest']) + " \n\n Global:" + fmt(item['global']['latest']);
-                    c.reply(price)
-                    print(price)
+                    q = q.strip()
+                    qty = q.split("*")
+
+                    q = qty[0];
+
+                    if len(qty) > 1:
+                        qty = int(qty[1]);
+                    else:
+                        qty = 1;
+
+
+                    url= "https://www.romexchange.com/api?exact=false&item=" + urllib.quote_plus(q)
+
+                    print(url)
+
+                    contents = urllib2.urlopen(url).read()
+                    items = json.loads(contents)
+
+                    if (len(items)):
+                        for x in range(qty):
+                            item = items[0]
+                            price = "Item:**" + item['name'] + "** SEA:" + fmt(item['sea']['latest']) + " Global:" + fmt(item['global']['latest']) + " \n\n ";
+
+                            cart = cart + price
+                            # totalsea = totalsea + item['sea']['latest']
+                            # totalglobal = totalglobal + item['global']['latest']
+
+                if (cart):
+                    # cart = cart + "**TOTAL:** SEA: " + fmt(totalsea) + " Global: " + fmt(totalglobal)
+
+                    print(cart)
+                    c.reply(cart)
                     comment_replied_to.append(id)
                 else:
-                    c.reply("Item not found")
-                    print("not found")
                     comment_replied_to.append(id)
-
-
-
 
 
 # Write our updated list back to the file

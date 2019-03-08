@@ -57,7 +57,7 @@ def fmt(i):
 
 # Get the top 5 values from our subreddit
 subreddit = reddit.subreddit('pythonforengineers')
-for submission in subreddit.hot(limit=10):
+for submission in subreddit.new(limit=10):
     #print(submission.title)
 
     # If we haven't replied to this post before
@@ -82,7 +82,7 @@ for submission in subreddit.hot(limit=10):
                     if (m):
                         print("Bot replying to : ", comment.body)
 
-                        url= "https://www.romexchange.com/api?exact=false&item=" + urllib.quote_plus(m.group(1))
+                        url= "https://www.romexchange.com/api?item=" + urllib.quote_plus(m.group(1))
 
                         print(url)
 
@@ -94,11 +94,6 @@ for submission in subreddit.hot(limit=10):
                             price = "Item:**" + item['name'] + "** \n\n SEA:" + fmt(item['sea']['latest']) + " \n\n Global:" + fmt(item['global']['latest']);
                             comment.reply(price)
                             print(price)
-
-                            posts_replied_to.append(comment.id)
-                        else:
-                            comment.reply("Item not found")
-                            print("not found")
 
                             posts_replied_to.append(comment.id)
 
