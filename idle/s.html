@@ -1,0 +1,40 @@
+<script>
+    console.log("sss");
+    console.log(strand());
+
+    console.log(pdmg(23,51,"a*1.10+50"))
+    console.log("au")
+
+    function pdmg(a,d,s){
+        return a + eval(s) - d;
+    }
+
+    //aura
+    function au(){
+
+    }
+
+    function strand(){
+        var s = "";
+        for (var i = 0; i< 100; i++){
+            s+=roll();
+        }
+
+        var totes = 0;
+        for (var i = 1; i<= 6; i++){
+            totes += collect(s,i);
+        }
+
+        console.log(totes)
+
+        return s;
+    }
+    function collect(s,i){
+        var st = (s.match(new RegExp(i, "g")) || []).length;
+        console.log( i + " ==> " + st);
+        return st;
+    }
+    function roll(){
+        return 1 + Math.floor(Math.random() * 6)
+    }
+</script>
