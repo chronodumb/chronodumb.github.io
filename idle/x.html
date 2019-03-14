@@ -26,15 +26,14 @@
     console.log(sx(130,1,1.1));
     console.log(sx(130,50,1.1));
 
-    //hearts
+    //hearts, black to red. border changes too
     function trn(n){
         return n * (n + 1) / 2 * 10;
     }
 
-    //stars
+    //stars, white->green->blue->purple->red->gold
     function sqn(n){
-        n+=2;
-        return n * n;
+        return 6 * n;
     }
 
     function msq(n){
@@ -45,11 +44,15 @@
 
     //hit per heart?
     function rph(h){
-        return rnd(0.80+(h*2/100),1.0 + (1 * h/100));
+        return rnd(0.80+(h*2/100),1.0 + (1.5 * h/100));
     }
 
     function dmg(){
-        pow * (a / d) * rph;
+        return pow * ((a + a) / (a + d)) * rph * el * te * cd * mod;
+    }
+
+    function ad(a,d){
+        return ((a + a) / (a + d));
     }
 
     function rnd(min,max) {
@@ -69,22 +72,27 @@
         type: 'line',
         data: {
             label:"test",
-            labels: Array(max),
+            labels: Array(max+1),
             datasets: [{
                 label:"test",
                 data: testdata(),
                 borderWidth: 1
             }]
         },
+
+
     });
 
     //returns 100
     function testdata(){
         var data = [];
-        for (var i = 1; i <= max; i++){
-            data.push(rph(10))
+        var total = 0;
+        for (var i = 0; i <= max; i++){
+            data.push(ad(i,50));
+            total = total + data[i];
         }
         console.log(data);
+        console.log(total);
         return data;
     }
 </script>
