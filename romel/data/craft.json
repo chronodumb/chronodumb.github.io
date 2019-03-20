@@ -1,0 +1,60 @@
+{
+  "items": {
+    "Buster[1]": [
+      {
+        "recipe": {
+          "Iron": 10,
+          "Rotten Bandage": 80,
+          "Black Magic Ore": 10
+        },
+        "fee": 10000,
+        "craft": true,
+        "location": "Todak Ugarte (Prontera)",
+        "quest": "none"
+      },
+      {
+        "recipe": {
+          "Steel": 10,
+          "Iron": 80,
+          "Sleepless Stone": 10,
+          "Memento": 10
+        },
+        "fee": 10000
+      },
+      {
+        "recipe": {
+          "Coal": 35,
+          "Steel": 40,
+          "Normal Precision Stone": 10,
+          "Scell": 150
+        },
+        "fee": 10000
+      },
+      {
+        "recipe": {
+          "Star Crumb": 2,
+          "Gold Sand": 50,
+          "Elunium": 6,
+          "Zargon": 180
+        },
+        "fee": 10000
+      },
+      {
+        "recipe": {
+          "Pearl": 2,
+          "Mercury": 55,
+          "Oridicon": 6,
+          "Evil Horn": 250
+        },
+        "fee": 10000,
+        "end": "Doom Axe[1]"
+      }
+    ],
+
+    "Crossbow[1]":{
+
+    }
+
+  }
+
+}

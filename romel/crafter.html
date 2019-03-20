@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>ROMCraft</title>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery.ui.min.js"></script>
+        <script>
+            console.log("get");
+            $.getJSON("data/craft.json", function(data) {
+                console.log("got");
+
+                $( "#item" ).autocomplete({
+                    source: Object.keys(data.items)
+                });
+
+            })
+            .done(function() {
+                console.log( "second success" );
+            })
+            .fail(function() {
+                console.log( "error" );
+            })
+            .always(function() {
+                console.log( "complete" );
+            });
+        </script>
+    </head>
+    <body>
+
+        ITEM: <input id="item" type="text" value="" placeholder="item"/>
+
+    </body>
+
+</html>
