@@ -1,0 +1,156 @@
+<html>
+<head>
+    <title>ROM-Shopping Cart</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.ui.css"/>
+    <style>
+        table{
+            empty-cells: show;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        th, td{
+            border: 1px solid #81a4b5;
+            border-spacing: 0;
+            padding:0.5em;
+        }
+        th {
+            background-color: #9fbdff;
+        }
+
+
+        /*tr:nth-child(even) {background: #fff}*/
+        /*tr:nth-child(odd)  {background: #e3e9f7}*/
+
+        tr:hover{
+            background: #fff;
+            filter:brightness(0.9);
+        }
+
+        .qty{
+            border:none;outline:none;background:none;
+        }
+    </style>
+    <script>
+        const url = "https://www.romexchange.com/api?exact=false";
+        const items_url = "https://www.romexchange.com/api/items.json";
+
+        $.getJSON(items_url,function(data){
+            let auto = data.map(data => data.name);
+            $( "#item" ).autocomplete({
+                source: auto
+            });
+        });
+
+        function add() {
+            var item=$('#item').val();
+
+            if (!item){
+                return;
+            }
+
+            $('#item').prop('readonly', true);
+
+            $.getJSON(url+"&item="+item, function (data) {
+                if (data.length > 0){
+                    $("#total").before("<tr><td>"+ data[0].name +"</td><td><input class='qty' type='text' onchange='more(this)' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' price='"+data[0].global.latest+"'>" + data[0].global.latest + "</td><td class='price sea' price='"+data[0].sea.latest+"'>" + data[0].sea.latest + "</td></tr>")
+                } else {
+                    $("#total").before("<tr><td>"+ item +"</td><td><input class='qty' type='text' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' contenteditable>" + 0 + "</td><td class='price sea' contenteditable>" + 0 + "</td></tr>")
+                }
+                total();
+            }).done(function() {
+                $('#item').prop('readonly', false);
+                $('#item').val('');
+            })
+        }
+
+        function more(e,add){
+            if (isNaN(e.value)){
+                e.value = 1;
+            }
+
+            var qty = e.value;
+
+            var global_price = $(e).parent().next();
+            global_price.html(global_price.attr('price') * qty);
+
+            var sea_price = $(e).parent().next().next();
+            sea_price.html(sea_price.attr('price') * qty);
+
+            total();
+        }
+
+        function total(){
+            var totalQty = 0;
+            var totalPriceGlobal = 0;
+            var totalPriceSea = 0;
+
+            $(".qty").each(function(i,n){
+                totalQty+= Number(this.value);
+            });
+
+
+            $(".price.global").each(function(i,n){
+                totalPriceGlobal+= Number(this.innerHTML.replace(/,/g, ''));
+            });
+
+
+            $(".price.sea").each(function(i,n){
+                totalPriceSea+= Number(this.innerHTML.replace(/,/g, ''));
+            });
+
+            $("#totalQty").html(totalQty);
+            $("#totalPriceGlobal").html(totalPriceGlobal);
+            $("#totalPriceSea").html(totalPriceSea);
+
+            numberFormat();
+        }
+
+        function numberFormat(){
+            $(".price, .total").each(function(){
+                var n = Number(this.innerHTML.replace(/,/g, ''));
+                this.innerHTML = String(n).replace(/(.)(?=(\d{3})+$)/g,'$1,')
+            })
+
+        }
+
+    </script>
+    <style>
+        .global {display:none}
+        .search_bar{
+            padding:10px;
+            margin:0px;
+            position:fixed;
+            background:white;
+            top:0;
+            left:0;
+        }
+    </style>
+</head>
+<body>
+    <div class="search_bar">
+        Search: <input type="text" id="item" size="30"/> <input type="button" value="+" onclick="add()"/> <select id="server" onchange="$('.price').toggle()"><option>Global</option><option selected>SEA</option></select>
+    </div>
+    <br/>
+    <br/>
+    <div>
+        <table>
+            <tr>
+                <th width="200px">Items</th>
+                <th >Qty.</th>
+                <th width="100px" class="global">Price</th>
+                <th width="100px" class="sea">Price</th>
+            </tr>
+
+            <tr id="total" class="total_row">
+                <td>TOTAL</td>
+                <td id="totalQty">0</td>
+                <td id="totalPriceGlobal" class="total global" >0z</td>
+                <td id="totalPriceSea" class="total sea" >0z</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

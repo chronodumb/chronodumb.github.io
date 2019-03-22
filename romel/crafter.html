@@ -23,6 +23,36 @@
                 console.log( "complete" );
             });
         </script>
+
+        <!-- TEST XHR -->
+        <script>
+            // var xhr = new XMLHttpRequest();
+            // xhr.open("POST", "https://search.roexplorer.com/explore/item/_msearch?");
+            // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            // xhr.onreadystatechange = init();
+            // xhr.send("{\"preference\":\"catFilter\"}\n" +
+            //     "{\"query\":{\"match_all\":{}},\"size\":0,\"aggs\":{\"sub_cat.keyword\":{\"terms\":{\"field\":\"sub_cat.keyword\",\"size\":1000,\"order\":{\"_term\":\"asc\"}}}}}\n");
+            // // xhr.send();
+            // function init(){
+            //     console.log(xhr.responseText);
+            // }
+
+            // var http = new XMLHttpRequest();
+            // var url = "https://search.roexplorer.com/explore/item/_msearch?";
+            // var params = "{\"preference\":\"catFilter\"}\n" +
+            //     "{\"query\":{\"match_all\":{}},\"size\":0,\"aggs\":{\"sub_cat.keyword\":{\"terms\":{\"field\":\"sub_cat.keyword\",\"size\":1000,\"order\":{\"_term\":\"asc\"}}}}}\n";
+            // http.open('POST', url, true);
+            //
+            // http.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+            //
+            // http.onreadystatechange = function() {//Call a function when the state changes.
+            //     if(http.readyState == 4 && http.status == 200) {
+            //         console.log("received");
+            //         console.log(http.responseText);
+            //     }
+            // }
+            // http.send(params);
+        </script>
     </head>
     <body>
 
