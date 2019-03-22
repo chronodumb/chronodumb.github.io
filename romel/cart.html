@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>ROM-Shopping Cart</title>
+    <title>ROMCraft - Shopping Cart</title>
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery.ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/jquery.ui.css"/>
@@ -54,9 +54,9 @@
 
             $.getJSON(url+"&item="+item, function (data) {
                 if (data.length > 0){
-                    $("#total").before("<tr><td>"+ data[0].name +"</td><td><input class='qty' type='text' onchange='more(this)' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' price='"+data[0].global.latest+"'>" + data[0].global.latest + "</td><td class='price sea' price='"+data[0].sea.latest+"'>" + data[0].sea.latest + "</td></tr>")
+                    $("#total").before("<tr><td>"+ data[0].name +"</td><td><input class='qty' type='text' onchange='more(this)' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' price='"+data[0].global.latest+"'>" + data[0].global.latest + "</td><td class='price sea' price='"+data[0].sea.latest+"'>" + data[0].sea.latest + "</td><td><input type='button' value='-' onclick='remove(this)'/></td></tr>")
                 } else {
-                    $("#total").before("<tr><td>"+ item +"</td><td><input class='qty' type='text' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' contenteditable>" + 0 + "</td><td class='price sea' contenteditable>" + 0 + "</td></tr>")
+                    $("#total").before("<tr><td>"+ item +"</td><td><input class='qty' type='text' value='1' size='2' style='border:none;outline:none'/></td><td class='price global' contenteditable>" + 0 + "</td><td class='price sea' contenteditable>" + 0 + "</td><td><input type='button' value='-' onclick='remove(this)'/></td></tr>")
                 }
                 total();
             }).done(function() {
@@ -115,6 +115,11 @@
 
         }
 
+        function remove(e){
+            $(e).parent().parent()  .remove();
+            total();
+        }
+
     </script>
     <style>
         .global {display:none}
@@ -129,28 +134,30 @@
     </style>
 </head>
 <body>
-    <div class="search_bar">
-        Search: <input type="text" id="item" size="30"/> <input type="button" value="+" onclick="add()"/> <select id="server" onchange="$('.price').toggle()"><option>Global</option><option selected>SEA</option></select>
-    </div>
-    <br/>
-    <br/>
-    <div>
-        <table>
-            <tr>
-                <th width="200px">Items</th>
-                <th >Qty.</th>
-                <th width="100px" class="global">Price</th>
-                <th width="100px" class="sea">Price</th>
-            </tr>
+<div class="search_bar">
+    Search: <input type="text" id="item" size="30"/> <input type="button" value="+" onclick="add()"/> <select id="server" onchange="$('.price, .total').toggle()"><option>Global</option><option selected>SEA</option></select>
+</div>
+<br/>
+<br/>
+<div>
+    <table>
+        <tr>
+            <th width="200px">Items</th>
+            <th >Qty.</th>
+            <th width="100px" class="global">Price</th>
+            <th width="100px" class="sea">Price</th>
+            <th></th>
+        </tr>
 
-            <tr id="total" class="total_row">
-                <td>TOTAL</td>
-                <td id="totalQty">0</td>
-                <td id="totalPriceGlobal" class="total global" >0z</td>
-                <td id="totalPriceSea" class="total sea" >0z</td>
-            </tr>
-        </table>
-    </div>
+        <tr id="total" class="total_row">
+            <td>TOTAL</td>
+            <td id="totalQty">0</td>
+            <td id="totalPriceGlobal" class="total global" >0z</td>
+            <td id="totalPriceSea" class="total sea" >0z</td>
+            <td></td>
+        </tr>
+    </table>
+</div>
 
 </body>
 </html>
