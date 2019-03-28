@@ -1,0 +1,283 @@
+<html>
+    <head>
+
+        <script src="js/jquery.min.js"></script>
+        <script>
+            var faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+
+            var combo = [
+                {"111"    :  5},
+                {"222"    :  5},
+                {"333"    :  5},
+                {"444"    :  5},
+                {"555"    :  5},
+                {"666"    :  5},
+                {"123"    :  5},
+                {"234"    :  5},
+                {"456"    :  5},
+                {"135"    :  5},
+                {"236"    :  5},
+                {"1122"   : 10},
+                {"1133"   : 10},
+                {"1144"   : 10},
+                {"1155"   : 10},
+                {"1166"   : 10},
+                {"2233"   : 10},
+                {"2244"   : 10},
+                {"2255"   : 10},
+                {"2266"   : 10},
+                {"3344"   : 10},
+                {"3355"   : 10},
+                {"3366"   : 10},
+                {"4455"   : 10},
+                {"4466"   : 10},
+                {"5566"   : 10},
+                {"111111" : 15},
+                {"222222" : 15},
+                {"333333" : 15},
+                {"444444" : 15},
+                {"555555" : 15},
+                {"666666" : 15},
+            ];
+
+            console.log(combo.length)
+
+            function makeDeck(opt){
+                //add base deck
+                var deck = [];
+
+                for (var i = 1; i <= 6; i++){
+                    deck.push()
+                }
+
+
+                //add optional expansions
+            }
+
+            function diceRoll(die){
+                var f = roll();
+                $(die).addClass("rolling");
+
+                setTimeout(function(die){
+                    $(die).removeClass("rolling");
+                    $(die).children(".face").html(faces[f]);
+                }, 1000, die);
+
+            }
+
+            function roll(){
+                return Math.floor(Math.random() * ((6 - 1) + 1) + 1);
+            }
+
+            function rollAll(pid){
+                console.log("rolll")
+                $("."+pid+" .die").each(function(i,n){
+                    console.log(i + "," + n);
+                    diceRoll(n);
+                })
+            }
+
+            function reroll(pid){
+                rollAll(pid)
+            }
+
+
+        </script>
+        <style>
+            .die {
+                font-family: "Arial";
+                font-size:24px;
+                width:30px;
+                height:30px;
+                z-index:2;
+                cursor:move;
+                user-select: none;
+                display:inline-block;
+            }
+
+
+            .die.rolling {
+                pointer-events:none;
+            }
+            .die.rolling .bounce{
+                display:block;
+            }
+            .die.rolling .face{
+                display:none;
+            }
+
+            .bounce{
+                animation: shake 1s;
+                display:none;
+            }
+
+            .roll {
+                animation: spin 1.6s;
+                text-align:center;
+            }
+
+            @keyframes spin {
+                0% {transform:rotate(180deg)}
+                0% {transform:rotate(0deg)}
+                100% {transform:rotate(-360deg)}
+            }
+
+            @keyframes shake {
+                10%, 90% {
+                    transform: translate3d(0, -1px, 0);
+                }
+
+                20%, 80% {
+                    transform: translate3d(0, 2px, 0);
+                }
+
+                50% {
+                    transform: translate3d(0, -8px, 0);
+                }
+
+                30%, 70% {
+                    transform: translate3d(0, -4px, 0);
+                }
+
+                40%, 60% {
+                    transform: translate3d(0, -4px, 0);
+                }
+            }
+
+            .p {
+                border:2px solid;
+                width:300px;
+                margin:10px;
+                padding: 5px;
+                position:relative;
+            }
+
+            .name{
+                width:200px;
+                position:relative;
+            }
+
+            .score{
+                width:100px;
+                position:absolute;
+                top:0;
+                right:0;
+                text-align: right;
+            }
+
+            .options{
+                width: 80px;
+                position:absolute;
+                top:0;
+                right:0;
+                text-align: center;
+            }
+
+            .options input{
+                margin:3px;
+                width:65px;
+            }
+        </style>
+    </head>
+    <body>
+
+
+
+        <div class="die" onclick="diceRoll(this)" face="1">
+            <div class="face state">
+                ⚀
+            </div>
+            <div class="bounce state">
+                <div class="roll">
+                    🎲
+                </div>
+            </div>
+        </div>
+
+        <div class="p p1" >
+            <div class="name">
+                P1
+
+                <span class="score">
+                    Score: 0
+                </span>
+            </div>
+            <div class="field">
+                <div class="die" face="1" onclick="diceRoll(this)" >
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+                <div class="die" face="1">
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+                <div class="die" face="1">
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+                <div class="die" face="1">
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+                <div class="die" face="1">
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+                <div class="die" face="1">
+                    <div class="face state">
+                        ⚀
+                    </div>
+                    <div class="bounce state">
+                        <div class="roll">
+                            🎲
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="options">
+
+                <input type="button" value="Re-roll" onclick="reroll('p1')"/>
+                <input type="button" value="End turn"/>
+
+            </div>
+        </div>
+
+    </body>
+</html>
