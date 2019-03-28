@@ -3,64 +3,93 @@
 
         <script src="js/jquery.min.js"></script>
         <script>
-            var faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+            var faces = ["","⚀","⚁","⚂","⚃","⚄","⚅"];
+
+            var deck = [];
+
+            var state = {
+                turn : 0,
+                players: {
+                    "p1" : {
+                        "name":"Player 1",
+                        "score":0,
+                        "dice": [1,1,1,1,1,1],
+                        "reroll":true,
+                    },
+                    "p2" : {
+                        "name":"Player 2",
+                    },
+                    "p3": {
+                        "name":"Player 3",
+                    },
+                    "p4": {
+                        "name":"Player 4",
+                    }
+                },
+                deck: [],
+                cards: [
+                    {
+                        "pattern":111,
+                        "point":5,
+                        "bid":{
+                            "p1": [],
+                            "p2": [],
+                            "p3": [],
+                            "p4": [],
+                        }
+                    }
+                ],
+
+
+
+            }
 
             var combo = [
-                {"111"    :  5},
-                {"222"    :  5},
-                {"333"    :  5},
-                {"444"    :  5},
-                {"555"    :  5},
-                {"666"    :  5},
-                {"123"    :  5},
-                {"234"    :  5},
-                {"456"    :  5},
-                {"135"    :  5},
-                {"236"    :  5},
-                {"1122"   : 10},
-                {"1133"   : 10},
-                {"1144"   : 10},
-                {"1155"   : 10},
-                {"1166"   : 10},
-                {"2233"   : 10},
-                {"2244"   : 10},
-                {"2255"   : 10},
-                {"2266"   : 10},
-                {"3344"   : 10},
-                {"3355"   : 10},
-                {"3366"   : 10},
-                {"4455"   : 10},
-                {"4466"   : 10},
-                {"5566"   : 10},
-                {"111111" : 15},
-                {"222222" : 15},
-                {"333333" : 15},
-                {"444444" : 15},
-                {"555555" : 15},
-                {"666666" : 15},
+                {"pattern": "111"    , "point" :  5},
+                {"pattern": "222"    , "point" :  5},
+                {"pattern": "333"    , "point" :  5},
+                {"pattern": "444"    , "point" :  5},
+                {"pattern": "555"    , "point" :  5},
+                {"pattern": "666"    , "point" :  5},
+                {"pattern": "123"    , "point" :  5},
+                {"pattern": "234"    , "point" :  5},
+                {"pattern": "456"    , "point" :  5},
+                {"pattern": "135"    , "point" :  5},
+                {"pattern": "236"    , "point" :  5},
+                {"pattern": "1122"   , "point" : 10},
+                {"pattern": "1133"   , "point" : 10},
+                {"pattern": "1144"   , "point" : 10},
+                {"pattern": "1155"   , "point" : 10},
+                {"pattern": "1166"   , "point" : 10},
+                {"pattern": "2233"   , "point" : 10},
+                {"pattern": "2244"   , "point" : 10},
+                {"pattern": "2255"   , "point" : 10},
+                {"pattern": "2266"   , "point" : 10},
+                {"pattern": "3344"   , "point" : 10},
+                {"pattern": "3355"   , "point" : 10},
+                {"pattern": "3366"   , "point" : 10},
+                {"pattern": "4455"   , "point" : 10},
+                {"pattern": "4466"   , "point" : 10},
+                {"pattern": "5566"   , "point" : 10},
+                {"pattern": "111111" , "point" : 15},
+                {"pattern": "222222" , "point" : 15},
+                {"pattern": "333333" , "point" : 15},
+                {"pattern": "444444" , "point" : 15},
+                {"pattern": "555555" , "point" : 15},
+                {"pattern": "666666" , "point" : 15},
             ];
 
             console.log(combo.length)
 
-            function makeDeck(opt){
-                //add base deck
-                var deck = [];
 
-                for (var i = 1; i <= 6; i++){
-                    deck.push()
-                }
-
-
-                //add optional expansions
-            }
-
-            function diceRoll(die){
-                var f = roll();
+            //move this to server side;
+            function diceRoll(die,f){
+                //var f = roll();
                 $(die).addClass("rolling");
 
                 setTimeout(function(die){
                     $(die).removeClass("rolling");
-                    $(die).children(".face").html(faces[f]);
+                    // $(die).children(".face").html(faces[f]);
                 }, 1000, die);
 
             }
@@ -69,19 +98,111 @@
                 return Math.floor(Math.random() * ((6 - 1) + 1) + 1);
             }
 
+
             function rollAll(pid){
-                console.log("rolll")
-                $("."+pid+" .die").each(function(i,n){
-                    console.log(i + "," + n);
-                    diceRoll(n);
-                })
+                console.log("roll");
+                coverUp(2000)
+
+                $("."+pid+" .die").hide();
+
+                //GET THIS VALUE FROM SERVERSIDE
+                dice = state.players[pid].dice;
+                for (var i=0; i<dice.length; i++){
+                    dice[i] = roll();
+                    var n =  $("."+pid+" .die"+(i+1));
+
+                    $(n).children(".face").html(faces[dice[i]]);
+
+                    setTimeout(function(n){n.show();diceRoll(n);},200*i,n);
+                }
+
+                // $("."+pid+" .die").each(function(i,n){
+                //     console.log(i + "," + n);
+                //     setTimeout(function(n){diceRoll(n,dice[i]);},200*i,n);
+                // })
+            }
+
+            function status(){
+                console.log(state);
+            }
+
+            function coverUp(ms,text){
+                $(".cover").show();
+                setTimeout(function(){
+                    $(".cover").hide();
+                },ms);
             }
 
             function reroll(pid){
                 rollAll(pid)
             }
 
+            function turn(pid){
+                console.log("turn " + pid);
+                rollAll(pid);
+            }
 
+
+            function init(){
+                console.log("start game");
+
+
+                deal();
+
+
+
+
+                turn("p1");
+            }
+
+            function deal(){
+                deck=combo.splice(0);
+                shuffle(deck);
+                draw();draw();draw();
+            }
+
+            function shuffle(array) {
+                console.log("shuffle");
+
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+            }
+
+            function draw(){
+                var card = deck.splice(0,1)[0];
+
+                console.log(card);
+
+                $(".cards").append("<div class=\"card\" ><div class=\"box\" > <div class=\"face\"> " + getFaces(card.pattern) + " </div> <div class=\"point\"> " + card.point + " </div> </div> </div>");
+            }
+
+
+            String.prototype.replaceAll = function(search, replacement) {
+                var target = this;
+                return target.replace(new RegExp(search, 'g'), replacement);
+            };
+
+
+            function getFaces(pattern){
+                pattern = pattern.replaceAll("1","⚀ ");
+                pattern = pattern.replaceAll("2","⚁ ");
+                pattern = pattern.replaceAll("3","⚂ ");
+                pattern = pattern.replaceAll("4","⚃ ");
+                pattern = pattern.replaceAll("5","⚄ ");
+                pattern = pattern.replaceAll("6","⚅ ");
+
+                return pattern;
+            }
+
+
+
+            $(document).ready(function(){
+                init();
+            })
         </script>
         <style>
             .die {
@@ -147,6 +268,7 @@
             .p {
                 border:2px solid;
                 width:300px;
+                height: 50px;
                 margin:10px;
                 padding: 5px;
                 position:relative;
@@ -177,20 +299,73 @@
                 margin:3px;
                 width:65px;
             }
+
+            .cards{
+                width:500px;
+            }
+
+            .card {
+                display:inline-block;
+                height:200px;
+            }
+            .card .box {
+                width:80px;
+                height:120px;
+                margin:5px;
+                border: 2px solid;
+                display:inline-block;
+                position:relative;
+                vertical-align: top;
+            }
+            .card .face{
+                font-family: "Arial";
+                font-size:30px;
+                text-align:center;
+            }
+
+            .card .point{
+                position:absolute;
+                bottom:0;
+                right:0;
+                border:1px solid;
+                width:20px;
+                height:20px;
+                text-align:center;
+                border-radius:50%;
+            }
+
+            .cover {
+                width:100%;
+                height:100%;
+                top:0;
+                left:0;
+                z-index:10;
+                position:absolute;
+                display:none;
+            }
+
+            .p1.d, .p1 .die{
+                color:red
+            }
+
         </style>
     </head>
     <body>
+        <div class="cover">
+
+        </div>
 
 
+        <div class="cards">
+            <div class="card"><div class="box"> <div class="face"> ⚄ ⚄ ⚅ ⚅  </div> <div class="point"> 10 </div> </div>
 
-        <div class="die" onclick="diceRoll(this)" face="1">
-            <div class="face state">
-                ⚀
+            <div class="bid">
+                <div class="p1 d">⚄⚄⚅⚅⚅⚅</div>
+                <div class="p2 d">⚄⚄⚅⚅⚅⚅</div>
+                <div class="p3 d">⚄⚄⚅⚅⚅⚅</div>
+                <div class="p4 d">⚄⚄⚅⚅⚅⚅</div>
             </div>
-            <div class="bounce state">
-                <div class="roll">
-                    🎲
-                </div>
+
             </div>
         </div>
 
@@ -203,7 +378,7 @@
                 </span>
             </div>
             <div class="field">
-                <div class="die" face="1" onclick="diceRoll(this)" >
+                <div class="die die1" face="1" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -214,7 +389,7 @@
                     </div>
                 </div>
 
-                <div class="die" face="1">
+                <div class="die die2" face="1">
                     <div class="face state">
                         ⚀
                     </div>
@@ -225,7 +400,7 @@
                     </div>
                 </div>
 
-                <div class="die" face="1">
+                <div class="die die3" face="1">
                     <div class="face state">
                         ⚀
                     </div>
@@ -236,7 +411,7 @@
                     </div>
                 </div>
 
-                <div class="die" face="1">
+                <div class="die die4" face="1">
                     <div class="face state">
                         ⚀
                     </div>
@@ -247,7 +422,7 @@
                     </div>
                 </div>
 
-                <div class="die" face="1">
+                <div class="die die5" face="1">
                     <div class="face state">
                         ⚀
                     </div>
@@ -258,7 +433,7 @@
                     </div>
                 </div>
 
-                <div class="die" face="1">
+                <div class="die die6" face="1">
                     <div class="face state">
                         ⚀
                     </div>
