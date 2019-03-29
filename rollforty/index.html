@@ -109,7 +109,7 @@
                 dice = state.players[pid].dice;
                 for (var i=0; i<dice.length; i++){
                     dice[i] = roll();
-                    var n =  $("."+pid+" .die"+(i+1));
+                    var n =  $("."+pid+" .die"+i);
 
                     $(n).children(".face").html(faces[dice[i]]);
 
@@ -177,7 +177,7 @@
 
                 console.log(card);
 
-                $(".cards").append("<div class=\"card\" ><div class=\"box\" > <div class=\"face\"> " + getFaces(card.pattern) + " </div> <div class=\"point\"> " + card.point + " </div> </div> </div>");
+                $(".cards").append("<div class=\"card\" ><div class=\"box\" > <div class=\"face\"> " + getFaces(card.pattern) + " </div> <div class=\"point\"> " + card.point + " </div> </div> <div class=\"bid\"> <div class=\"p1 d\"></div> <div class=\"p2 d\"></div> <div class=\"p3 d\"></div> <div class=\"p4 d\"></div> </div></div>");
             }
 
 
@@ -198,6 +198,15 @@
                 return pattern;
             }
 
+            function bid(die){
+                $(".die"+die).addClass("dragged");
+            }
+
+            function place(die){
+                console.log("dropped");
+                $(".die"+die).removeClass("dragged");
+            }
+
 
 
             $(document).ready(function(){
@@ -214,6 +223,7 @@
                 cursor:move;
                 user-select: none;
                 display:inline-block;
+                opacity:1;
             }
 
 
@@ -345,8 +355,17 @@
             }
 
             .p1.d, .p1 .die{
-                color:red
+                color:red;
             }
+
+            .d{
+                height:16px
+            }
+
+            .die.dragged {
+                opacity:0.4;
+            }
+
 
         </style>
     </head>
@@ -360,10 +379,10 @@
             <div class="card"><div class="box"> <div class="face"> ⚄ ⚄ ⚅ ⚅  </div> <div class="point"> 10 </div> </div>
 
             <div class="bid">
-                <div class="p1 d">⚄⚄⚅⚅⚅⚅</div>
-                <div class="p2 d">⚄⚄⚅⚅⚅⚅</div>
-                <div class="p3 d">⚄⚄⚅⚅⚅⚅</div>
-                <div class="p4 d">⚄⚄⚅⚅⚅⚅</div>
+                <div class="p1 d"></div>
+                <div class="p2 d"></div>
+                <div class="p3 d"></div>
+                <div class="p4 d"></div>
             </div>
 
             </div>
@@ -378,7 +397,7 @@
                 </span>
             </div>
             <div class="field">
-                <div class="die die1" face="1" >
+                <div class="die die0" face="1" draggable="true" ondragover="bid(0)" ondrop="place(0)" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -389,7 +408,7 @@
                     </div>
                 </div>
 
-                <div class="die die2" face="1">
+                <div class="die die1" face="1" draggable="true" ondragover="bid(1)" ondrop="place(1)" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -400,7 +419,7 @@
                     </div>
                 </div>
 
-                <div class="die die3" face="1">
+                <div class="die die2" face="1" draggable="true" ondragover="bid(2)" ondrop="place(2)" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -411,7 +430,7 @@
                     </div>
                 </div>
 
-                <div class="die die4" face="1">
+                <div class="die die3" face="1" draggable="true" ondragover="bid(3)" ondrop="place(3)" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -422,7 +441,7 @@
                     </div>
                 </div>
 
-                <div class="die die5" face="1">
+                <div class="die die4" face="1" draggable="true" ondragover="bid(4)" ondrop="place(4)" >
                     <div class="face state">
                         ⚀
                     </div>
@@ -433,7 +452,7 @@
                     </div>
                 </div>
 
-                <div class="die die6" face="1">
+                <div class="die die5" face="1" draggable="true" ondragover="bid(5)" ondrop="place(5)" >
                     <div class="face state">
                         ⚀
                     </div>
