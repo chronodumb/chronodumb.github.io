@@ -5,40 +5,40 @@
         <script>
             var faces = ["","⚀","⚁","⚂","⚃","⚄","⚅"];
 
-            var deck = [];
-
             var state = {
                 turn : 0,
-                players: {
-                    "p1" : {
+                round: 0,
+                players: [
+                    {
+                        "empty":true
+                    },
+                    {
                         "name":"Player 1",
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
                     },
-                    "p2" : {
-                        "name":"Player 2",
-                    },
-                    "p3": {
-                        "name":"Player 3",
-                    },
-                    "p4": {
-                        "name":"Player 4",
-                    }
-                },
-                deck: [],
-                cards: [
                     {
-                        "pattern":111,
-                        "point":5,
-                        "bid":{
-                            "p1": [],
-                            "p2": [],
-                            "p3": [],
-                            "p4": [],
-                        }
+                        "name":"Player 2",
+                        "score":0,
+                        "dice": [1,1,1,1,1,1],
+                        "reroll":true,
+                    },
+                    {
+                        "name":"Player 3",
+                        "score":0,
+                        "dice": [1,1,1,1,1,1],
+                        "reroll":true,
+                    },
+                    {
+                        "name":"Player 4",
+                        "score":0,
+                        "dice": [1,1,1,1,1,1],
+                        "reroll":true,
                     }
                 ],
+                deck: [],
+                card: [],
 
 
 
@@ -103,23 +103,19 @@
                 console.log("roll");
                 coverUp(2000)
 
-                $("."+pid+" .die").hide();
+                $(".p"+pid+" .die").hide();
 
                 //GET THIS VALUE FROM SERVERSIDE
                 dice = state.players[pid].dice;
                 for (var i=0; i<dice.length; i++){
                     dice[i] = roll();
-                    var n =  $("."+pid+" .die"+i);
+                    var n =  $(".p"+pid+" .die"+i);
 
                     $(n).children(".face").html(faces[dice[i]]);
 
                     setTimeout(function(n){n.show();diceRoll(n);},200*i,n);
                 }
 
-                // $("."+pid+" .die").each(function(i,n){
-                //     console.log(i + "," + n);
-                //     setTimeout(function(n){diceRoll(n,dice[i]);},200*i,n);
-                // })
             }
 
             function status(){
@@ -137,28 +133,53 @@
                 rollAll(pid)
             }
 
-            function turn(pid){
-                console.log("turn " + pid);
-                rollAll(pid);
+            function turn(){
+                state.turn++;
+                state.turn = state.turn % 4;
+                console.log("turn " + state.turn);
+
+                rollAll(state.turn);
+                $("#main").removeClass();
+                $("#main").addClass("main")
+                $("#main").addClass("turn" + state.turn);
             }
 
 
             function init(){
                 console.log("start game");
 
-
+                seat();
                 deal();
 
+                setTimeout(function(){
+                    turn();
+                },1000);
+
+
+            }
+
+            function seat(){
+                console.log("players fill seats")
+
+                $(".players").html('');
+                for (var i=1; i < state.players.length; i++){
+                    var u = state.players[i];
+                    let p = $("#p").clone();
+                    $(p).addClass("p"+i);
+                    $(p).children(".name").html(u.name);
+                    $(p).children(".score").html(u.score);
+                    $(p).children(".options").children(".reroll").attr("onclick","reroll(" +i+ ")");
+                    $(".players").append(p);
+                }
 
 
 
-                turn("p1");
             }
 
             function deal(){
-                deck=combo.splice(0);
-                shuffle(deck);
-                draw();draw();draw();
+                state.deck=combo.splice(0);
+                shuffle(state.deck);
+                draw3();
             }
 
             function shuffle(array) {
@@ -172,12 +193,43 @@
                 }
             }
 
-            function draw(){
-                var card = deck.splice(0,1)[0];
+            function draw3(){
+                draw(1);
+                draw(2);
+                draw(3);
+
+                setTimeout(function(){
+                    render();
+                },500);
+            }
+
+            function draw(n){
+                var card = state.deck.splice(0,1)[0];
 
                 console.log(card);
 
-                $(".cards").append("<div class=\"card\" ><div class=\"box\" > <div class=\"face\"> " + getFaces(card.pattern) + " </div> <div class=\"point\"> " + card.point + " </div> </div> <div class=\"bid\"> <div class=\"p1 d\"></div> <div class=\"p2 d\"></div> <div class=\"p3 d\"></div> <div class=\"p4 d\"></div> </div></div>");
+                card.bid = [[],[],[],[]]
+
+                state.card.push(card);
+
+                console.log(state);
+
+                if (n){
+                    //do not render yet
+                } else {
+                    render();
+                }
+            }
+
+            //All changes in design shall call this render
+            function render(){
+                var cards = "";
+                for (var i=0; i<state.card.length; i++) {
+                    let card = state.card[i];
+                    cards += "<div class='card'> <div class=\"box\" > <div> " + getFaces(card, i) + " </div> <div class=\"point\"> " + card.point + " </div> </div> " + getBids(card,i) + " </div>"
+                }
+
+                $(".cards").html(cards);
             }
 
 
@@ -187,26 +239,108 @@
             };
 
 
-            function getFaces(pattern){
-                pattern = pattern.replaceAll("1","⚀ ");
-                pattern = pattern.replaceAll("2","⚁ ");
-                pattern = pattern.replaceAll("3","⚂ ");
-                pattern = pattern.replaceAll("4","⚃ ");
-                pattern = pattern.replaceAll("5","⚄ ");
-                pattern = pattern.replaceAll("6","⚅ ");
+            function getFaces(card, i){
+                var pattern = card.pattern;
+                pattern = pattern.replaceAll("1","<div class='face' face='1'>⚀</div>");
+                pattern = pattern.replaceAll("2","<div class='face' face='2'>⚁</div>");
+                pattern = pattern.replaceAll("3","<div class='face' face='3'>⚂</div>");
+                pattern = pattern.replaceAll("4","<div class='face' face='4'>⚃</div>");
+                pattern = pattern.replaceAll("5","<div class='face' face='5'>⚄</div>");
+                pattern = pattern.replaceAll("6","<div class='face' face='6'>⚅</div>");
+
+                var t = state.turn;
+                if (t>0) {
+                    if (card.bid[t-1].length > 0) {
+                        console.log("coloring")
+
+                        for (var i = 0; i < card.bid[t - 1].length; i++) {
+                            var x = card.bid[t- 1][i];
+
+                            pattern = pattern.replace("class='face' face='" + x + "'", "class='face on' face='" + x + "'");
+
+                        }
+                    }
+                }
 
                 return pattern;
             }
 
-            function bid(die){
-                $(".die"+die).addClass("dragged");
+            function getBids(){
+
+
+
+                return "<div class=\"bid\"> <div class=\"p1 d\"></div> <div class=\"p2 d\"></div> <div class=\"p3 d\"></div> <div class=\"p4 d\"></div> </div>";
             }
 
-            function place(die){
+            var dragdie = 0;
+
+            function drag(die){
+                console.log("dragged")
+                dragdie = die;
+            }
+
+            function drop(event){
                 console.log("dropped");
-                $(".die"+die).removeClass("dragged");
+                console.log($(event.target).attr("c"));
+
+                bid($(event.target));
             }
 
+            function bid(e){
+                var i = e.attr("c");
+
+                var c = state.card[i];
+                console.log(c);
+
+                var p = state.turn;
+                var x = state.players[p].dice[dragdie];
+
+                console.log(dragdie + " == " + x);
+
+                if (c.pattern.indexOf(x) < 0){
+                    sayno(e);
+                } else {
+
+                    //check first, what else can he bid
+                    var ba = c.pattern.split("").map(Number);
+
+                    var ab = c.bid[p-1];
+                    if (ab.length > 0){
+                        var np = c.pattern;
+
+                        for (var i = 0; i < ab.length; i++){
+                            np = np.replace(ab[i],"");
+                        }
+
+                        ba = np.split("").map(Number);
+                    }
+
+                    console.log(ba);
+
+
+                    if (ba.indexOf(x) >= 0){
+                        c.bid[p-1].push(x);
+                        console.log("pushed");
+                        console.log(state);
+
+                        render();
+
+                    } else{
+                        sayno(e);
+                    }
+
+
+                }
+            }
+
+            function sayno(e){
+                e.css("opacity",0.5);
+                setTimeout(function(){e.css("opacity",0)},500,e)
+            }
+
+            function allowDrop(event){
+                event.preventDefault();
+            }
 
 
             $(document).ready(function(){
@@ -214,6 +348,9 @@
             })
         </script>
         <style>
+            .html{
+                user-select: none;
+            }
             .die {
                 font-family: "Arial";
                 font-size:24px;
@@ -221,7 +358,6 @@
                 height:30px;
                 z-index:2;
                 cursor:move;
-                user-select: none;
                 display:inline-block;
                 opacity:1;
             }
@@ -311,7 +447,13 @@
             }
 
             .cards{
-                width:500px;
+                width:400px;
+                height:200px;
+            }
+
+            .cards .face:hover{
+                color:gray;
+                cursor:pointer;
             }
 
             .card {
@@ -327,10 +469,17 @@
                 position:relative;
                 vertical-align: top;
             }
+
+            .card.on .box{
+                border: 2px solid red;
+            }
+
             .card .face{
                 font-family: "Arial";
                 font-size:30px;
+                width:30px;
                 text-align:center;
+                display:inline-block;
             }
 
             .card .point{
@@ -344,9 +493,32 @@
                 border-radius:50%;
             }
 
+            .droparea{
+                position:absolute;
+                top:0;
+                left:0;
+                z-index:2;
+            }
+            .droparea .dc{
+                display:inline-block;
+                height:200px;
+                width:80px;
+                margin:5px;
+                text-align:center;
+                font-family: "Arial";
+                font-size:80px;
+                font-weight:bold;
+                color:red;
+                opacity:0;
+            }
+
+            .main {
+                height:600px;
+            }
+
             .cover {
                 width:100%;
-                height:100%;
+                height:600px;
                 top:0;
                 left:0;
                 z-index:10;
@@ -357,6 +529,15 @@
             .p1.d, .p1 .die{
                 color:red;
             }
+            .p2.d, .p2 .die{
+                color:blue;
+            }
+            .p3.d, .p3 .die{
+                color:green;
+            }
+            .p4.d, .p4 .die{
+                color:orange;
+            }
 
             .d{
                 height:16px
@@ -366,112 +547,137 @@
                 opacity:0.4;
             }
 
+            .shuffling {
+                postion:absolute;
+                top:20px;
+                text-align:center;
+            }
+
+            .main .p{
+                opacity:0.3;
+            }
+
+            .turn1 .p1, .turn2 .p2, .turn3 .p3, .turn4 .p4{
+                opacity:1;
+                pointer-events:auto;
+            }
+
+            .face.on{
+                color:red;
+            }
 
         </style>
     </head>
     <body>
-        <div class="cover">
+        <div class="main" id="main">
+            <div class="cover">
 
+            </div>
+
+            <div class='droparea' ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="dc" c='0'>🚫</div>
+                <div class="dc" c='1'>🚫</div>
+                <div class="dc" c='2'>🚫</div>
+            </div>
+
+            <div id="turn">
+
+            </div>
+            <div class="cards">
+
+                <div class="shuffling">Shuffling...</div>
+            </div>
+
+            <div style="display:none">
+                <div id="p" class="p">
+                    <div class="name">
+                        P1
+
+                        <span class="score">
+                        Score: 0
+                    </span>
+                    </div>
+                    <div class="field">
+                        <div class="die die0" id="d0" face="1" draggable="true" ondragstart="drag(0)" >
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="die die1" id="d1" face="1" draggable="true" ondragstart="drag(1)" >
+
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="die die2" id="d2" face="1" draggable="true" ondragstart="drag(2)" >
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="die die3" id="d3" face="1" draggable="true" ondragstart="drag(3)" >
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="die die4" id="d4"face="1" draggable="true" ondragstart="drag(4)" >
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="die die5" id="d5" face="1" draggable="true" ondragstart="drag(5)" >
+                            <div class="face state">
+                                ⚀
+                            </div>
+                            <div class="bounce state">
+                                <div class="roll">
+                                    🎲
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="options">
+
+                        <input type="button" value="Re-roll" class="reroll" onclick="reroll(1)"/>
+                        <input type="button" value="End turn"/>
+
+                    </div>
+                </div>
+            </div>
+            <div class="players">
+
+            </div>
         </div>
-
-
-        <div class="cards">
-            <div class="card"><div class="box"> <div class="face"> ⚄ ⚄ ⚅ ⚅  </div> <div class="point"> 10 </div> </div>
-
-            <div class="bid">
-                <div class="p1 d"></div>
-                <div class="p2 d"></div>
-                <div class="p3 d"></div>
-                <div class="p4 d"></div>
-            </div>
-
-            </div>
-        </div>
-
-        <div class="p p1" >
-            <div class="name">
-                P1
-
-                <span class="score">
-                    Score: 0
-                </span>
-            </div>
-            <div class="field">
-                <div class="die die0" face="1" draggable="true" ondragover="bid(0)" ondrop="place(0)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-                <div class="die die1" face="1" draggable="true" ondragover="bid(1)" ondrop="place(1)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-                <div class="die die2" face="1" draggable="true" ondragover="bid(2)" ondrop="place(2)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-                <div class="die die3" face="1" draggable="true" ondragover="bid(3)" ondrop="place(3)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-                <div class="die die4" face="1" draggable="true" ondragover="bid(4)" ondrop="place(4)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-                <div class="die die5" face="1" draggable="true" ondragover="bid(5)" ondrop="place(5)" >
-                    <div class="face state">
-                        ⚀
-                    </div>
-                    <div class="bounce state">
-                        <div class="roll">
-                            🎲
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="options">
-
-                <input type="button" value="Re-roll" onclick="reroll('p1')"/>
-                <input type="button" value="End turn"/>
-
-            </div>
-        </div>
-
     </body>
 </html>
