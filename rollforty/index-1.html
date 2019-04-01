@@ -2,9 +2,6 @@
     <head>
 
         <script src="js/jquery.min.js"></script>
-        <script src="js/jquery.ui.min.js"></script>
-
-
         <script>
             var faces = ["","⚀","⚁","⚂","⚃","⚄","⚅"];
 
@@ -42,9 +39,10 @@
                 ],
                 deck: [],
                 card: [],
-            }
 
-            var save={};
+
+
+            }
 
             var combo = [
                 {"pattern": "111"    , "point" :  5},
@@ -136,23 +134,14 @@
             }
 
             function turn(){
-                state.turn = state.turn % 4;
                 state.turn++;
-
+                state.turn = state.turn % 4;
                 console.log("turn " + state.turn);
 
                 rollAll(state.turn);
                 $("#main").removeClass();
                 $("#main").addClass("main")
                 $("#main").addClass("turn" + state.turn);
-
-                //save current state, need better way to handle this
-                setTimeout(function(){
-                    console.log("save")
-                    save = jQuery.extend(true, {}, state);
-                    render();
-                },2000);
-
             }
 
 
@@ -210,7 +199,7 @@
                 draw(3);
 
                 setTimeout(function(){
-                    //render();
+                    render();
                 },500);
             }
 
@@ -228,7 +217,7 @@
                 if (n){
                     //do not render yet
                 } else {
-                    //render();
+                    render();
                 }
             }
 
@@ -241,18 +230,6 @@
                 }
 
                 $(".cards").html(cards);
-            }
-
-            function prender(){
-                for (var pid=1; pid<state.players.length; pid++) {
-                    $(".p"+pid+" .die").hide();
-                    dice = state.players[pid].dice;
-                    for (var i = 0; i < dice.length; i++) {
-                        var n =  $(".p"+pid+" .die"+i);
-                        $(n).children(".face").html(faces[dice[i]]);
-                        $(n).show();
-                    }
-                }
             }
 
 
@@ -272,65 +249,35 @@
                 pattern = pattern.replaceAll("6","<div class='face' face='6'>⚅</div>");
 
                 var t = state.turn;
-                if (card.bid[t- 1].length > 0) {
-                    console.log("coloring")
+                if (t>0) {
+                    if (card.bid[t-1].length > 0) {
+                        console.log("coloring")
 
-                    for (var i = 0; i < card.bid[t - 1].length; i++) {
-                        var x = card.bid[t- 1][i];
+                        for (var i = 0; i < card.bid[t - 1].length; i++) {
+                            var x = card.bid[t- 1][i];
 
-                        pattern = pattern.replace("class='face' face='" + x + "'", "class='face on' face='" + x + "'");
+                            pattern = pattern.replace("class='face' face='" + x + "'", "class='face on' face='" + x + "'");
 
+                        }
                     }
                 }
 
                 return pattern;
             }
 
-            function getBids(card,i){
-                var bid = "<div class=\"bid\">";
+            function getBids(){
 
-                for(var i =0; i< 4; i++){
-                    var pattern = card.bid[i].join("");
-                    pattern = pattern.replaceAll("1","⚀");
-                    pattern = pattern.replaceAll("2","⚁");
-                    pattern = pattern.replaceAll("3","⚂");
-                    pattern = pattern.replaceAll("4","⚃");
-                    pattern = pattern.replaceAll("5","⚄");
-                    pattern = pattern.replaceAll("6","⚅");
 
-                    bid = bid + "<div class=\"p" + (i+1) + " d\">" + pattern + "</div> ";
-                }
 
-                bid = bid + "</div>";
-                return bid;
-
+                return "<div class=\"bid\"> <div class=\"p1 d\"></div> <div class=\"p2 d\"></div> <div class=\"p3 d\"></div> <div class=\"p4 d\"></div> </div>";
             }
 
             var dragdie = 0;
-            var dragobj = null;
 
-            function drag(die,obj){
+            function drag(die){
                 console.log("dragged")
                 dragdie = die;
-                dragobj = obj;
             }
-
-            function touchmove(ev){
-                console.log("touchmove");
-
-                console.log(ev.target);
-                var touchLocation = ev.targetTouches[0];
-
-
-                console.log(ev.targetTouches);
-
-
-                ev.target.style.position = "fixed";
-                ev.target.style.float = 10;
-                ev.target.style.left = touchLocation.pageX + 'px';
-                ev.target.style.top = touchLocation.pageY + 'px';
-            }
-
 
             function drop(event){
                 console.log("dropped");
@@ -368,7 +315,6 @@
                         ba = np.split("").map(Number);
                     }
 
-                    console.log("ba")
                     console.log(ba);
 
 
@@ -377,11 +323,7 @@
                         console.log("pushed");
                         console.log(state);
 
-                        state.players[p].dice.splice(dragdie,1);
-                        //remove from players
-
                         render();
-                        prender()
 
                     } else{
                         sayno(e);
@@ -398,22 +340,6 @@
 
             function allowDrop(event){
                 event.preventDefault();
-            }
-
-            //rollback save
-            function undo(){
-                state = jQuery.extend(true, {}, save);
-                render();
-                prender();
-            }
-
-            //finish turn
-            function next(){
-                $(".face").removeClass("on");
-
-                //check ownership!
-
-                turn();
             }
 
 
@@ -533,7 +459,6 @@
             .card {
                 display:inline-block;
                 height:200px;
-                vertical-align: top;
             }
             .card .box {
                 width:80px;
@@ -615,7 +540,7 @@
             }
 
             .d{
-                height:16px !important;
+                height:16px
             }
 
             .die.dragged {
@@ -637,17 +562,8 @@
                 pointer-events:auto;
             }
 
-            .turn1 .face.on{
+            .face.on{
                 color:red;
-            }
-            .turn2 .face.on{
-                color:blue;
-            }
-            .turn3 .face.on{
-                color:green;
-            }
-            .turn4 .face.on{
-                color:yellow;
             }
 
         </style>
@@ -682,7 +598,7 @@
                     </span>
                     </div>
                     <div class="field">
-                        <div class="die die0" id="d0" face="1" draggable="true" ondragstart="drag(0,this)" ontouchmove="touchmove(event)">
+                        <div class="die die0" id="d0" face="1" draggable="true" ondragstart="drag(0)" >
                             <div class="face state">
                                 ⚀
                             </div>
@@ -693,7 +609,7 @@
                             </div>
                         </div>
 
-                        <div class="die die1" id="d1" face="1" draggable="true" ondragstart="drag(1,this)" ontouchmove="touchmove(event)">
+                        <div class="die die1" id="d1" face="1" draggable="true" ondragstart="drag(1)" >
 
                             <div class="face state">
                                 ⚀
@@ -705,7 +621,7 @@
                             </div>
                         </div>
 
-                        <div class="die die2" id="d2" face="1" draggable="true" ondragstart="drag(2,this)" ontouchmove="touchmove(event)">
+                        <div class="die die2" id="d2" face="1" draggable="true" ondragstart="drag(2)" >
                             <div class="face state">
                                 ⚀
                             </div>
@@ -716,7 +632,7 @@
                             </div>
                         </div>
 
-                        <div class="die die3" id="d3" face="1" draggable="true" ondragstart="drag(3,this)" ontouchmove="touchmove(event)">
+                        <div class="die die3" id="d3" face="1" draggable="true" ondragstart="drag(3)" >
                             <div class="face state">
                                 ⚀
                             </div>
@@ -727,7 +643,7 @@
                             </div>
                         </div>
 
-                        <div class="die die4" id="d4"face="1" draggable="true" ondragstart="drag(4,this)" ontouchmove="touchmove(event)">
+                        <div class="die die4" id="d4"face="1" draggable="true" ondragstart="drag(4)" >
                             <div class="face state">
                                 ⚀
                             </div>
@@ -738,7 +654,7 @@
                             </div>
                         </div>
 
-                        <div class="die die5" id="d5" face="1" draggable="true" ondragstart="drag(5,this)" ontouchmove="touchmove(event)">
+                        <div class="die die5" id="d5" face="1" draggable="true" ondragstart="drag(5)" >
                             <div class="face state">
                                 ⚀
                             </div>
@@ -753,9 +669,8 @@
 
                     <div class="options">
 
-                        <!--<input type="button" value="Re-roll" class="reroll" onclick="reroll(1)"/>-->
-                        <input type="button" value="Undo" onclick="undo()"/>
-                        <input type="button" value="End"  onclick="next()"/>
+                        <input type="button" value="Re-roll" class="reroll" onclick="reroll(1)"/>
+                        <input type="button" value="End turn"/>
 
                     </div>
                 </div>
@@ -764,8 +679,5 @@
 
             </div>
         </div>
-
-
-
     </body>
 </html>
