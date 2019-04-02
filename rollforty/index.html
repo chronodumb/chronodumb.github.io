@@ -9,12 +9,9 @@
             var faces = ["","⚀","⚁","⚂","⚃","⚄","⚅"];
 
             var state = {
-                turn : 0,
+                turn : -1,
                 round: 0,
                 players: [
-                    {
-                        "empty":true
-                    },
                     {
                         "name":"Player 1",
                         "score":0,
@@ -136,8 +133,8 @@
             }
 
             function turn(){
-                state.turn = state.turn % 4;
                 state.turn++;
+                state.turn = state.turn % 4;
 
                 console.log("turn " + state.turn);
 
@@ -145,6 +142,10 @@
                 $("#main").removeClass();
                 $("#main").addClass("main")
                 $("#main").addClass("turn" + state.turn);
+
+                while (state.card.length < 3){
+                    draw();
+                }
 
                 //save current state, need better way to handle this
                 setTimeout(function(){
@@ -160,7 +161,8 @@
                 console.log("start game");
 
                 seat();
-                deal();
+                shuffle(state.deck);
+                // deal();
 
                 setTimeout(function(){
                     turn();
@@ -173,7 +175,7 @@
                 console.log("players fill seats")
 
                 $(".players").html('');
-                for (var i=1; i < state.players.length; i++){
+                for (var i=0; i < state.players.length; i++){
                     var u = state.players[i];
                     let p = $("#p").clone();
                     $(p).addClass("p"+i);
@@ -187,14 +189,15 @@
 
             }
 
-            function deal(){
-                state.deck=combo.splice(0);
-                shuffle(state.deck);
-                draw3();
-            }
+            // function deal(){
+            //     state.deck=combo.splice(0);
+            //     shuffle(state.deck);
+            //     draw3();
+            // }
 
             function shuffle(array) {
                 console.log("shuffle");
+                state.deck=combo.splice(0);
 
                 for (var i = array.length - 1; i > 0; i--) {
                     var j = Math.floor(Math.random() * (i + 1));
@@ -224,12 +227,6 @@
                 state.card.push(card);
 
                 console.log(state);
-
-                if (n){
-                    //do not render yet
-                } else {
-                    //render();
-                }
             }
 
             //All changes in design shall call this render
@@ -237,14 +234,14 @@
                 var cards = "";
                 for (var i=0; i<state.card.length; i++) {
                     let card = state.card[i];
-                    cards += "<div class='card'> <div class=\"box\" > <div> " + getFaces(card, i) + " </div> <div class=\"point\"> " + card.point + " </div> </div> " + getBids(card,i) + " </div>"
+                    cards += "<div class='card card"+i+"'> <div class=\"box\" > <div> " + getFaces(card, i) + " </div> <div class=\"point\"> " + card.point + " </div> </div> " + getBids(card,i) + " </div>"
                 }
 
                 $(".cards").html(cards);
             }
 
             function prender(){
-                for (var pid=1; pid<state.players.length; pid++) {
+                for (var pid=0; pid<state.players.length; pid++) {
                     $(".p"+pid+" .die").hide();
                     dice = state.players[pid].dice;
                     for (var i = 0; i < dice.length; i++) {
@@ -272,11 +269,11 @@
                 pattern = pattern.replaceAll("6","<div class='face' face='6'>⚅</div>");
 
                 var t = state.turn;
-                if (card.bid[t- 1].length > 0) {
+                if (card.bid[t].length > 0) {
                     console.log("coloring")
 
-                    for (var i = 0; i < card.bid[t - 1].length; i++) {
-                        var x = card.bid[t- 1][i];
+                    for (var i = 0; i < card.bid[t].length; i++) {
+                        var x = card.bid[t][i];
 
                         pattern = pattern.replace("class='face' face='" + x + "'", "class='face on' face='" + x + "'");
 
@@ -298,7 +295,7 @@
                     pattern = pattern.replaceAll("5","⚄");
                     pattern = pattern.replaceAll("6","⚅");
 
-                    bid = bid + "<div class=\"p" + (i+1) + " d\">" + pattern + "</div> ";
+                    bid = bid + "<div class=\"p" + i + " d\">" + pattern + "</div> ";
                 }
 
                 bid = bid + "</div>";
@@ -357,7 +354,7 @@
                     //check first, what else can he bid
                     var ba = c.pattern.split("").map(Number);
 
-                    var ab = c.bid[p-1];
+                    var ab = c.bid[p];
                     if (ab.length > 0){
                         var np = c.pattern;
 
@@ -373,7 +370,8 @@
 
 
                     if (ba.indexOf(x) >= 0){
-                        c.bid[p-1].push(x);
+                        c.bid[p].push(x);
+                        c.bid[p].sort();
                         console.log("pushed");
                         console.log(state);
 
@@ -411,7 +409,39 @@
             function next(){
                 $(".face").removeClass("on");
 
-                //check ownership!
+                //check owning!
+                var c = state.card;
+                var t = state.turn;
+                var p = state.players;
+
+                var i = c.length;
+                while (i--){
+                    var card = c[i];
+
+                    if (card.bid[t].length > 0) {
+                        console.log( card.pattern + " == " + card.bid[t].join(""));
+                        if (card.pattern == card.bid[t].join("")) {
+                            alert(p[t].name + " got " + card.point + "points");
+                            p[t].score = p[t].score + card.point;
+
+                            $(".card"+i).addClass(".taken"+t)
+                            $(".p"+t).children(".score").html(p[t].score);
+
+                            for (var x = 0; x < p.length; x++){
+                                p[x].dice = p[x].dice.concat(card.bid[x])
+                                card.bid[x] = [];
+                            }
+
+                            c.splice(i,1);
+
+                            render();
+                            prender();
+
+                            break;
+                        }
+                    }
+
+                }
 
 
                 turn();
@@ -501,11 +531,13 @@
             }
 
             .score{
-                width:100px;
                 position:absolute;
-                top:0;
-                right:0;
+                padding:2px;
+                top:0px;
+                right:80px;
                 text-align: right;
+                border:1px solid;
+                width:30px;
             }
 
             .options{
@@ -602,16 +634,16 @@
                 display:none;
             }
 
-            .p1.d, .p1 .die{
+            .p0.d, .p0 .die, .card .taken0{
                 color:red;
             }
-            .p2.d, .p2 .die{
+            .p1.d, .p1 .die, .card .taken1{
                 color:blue;
             }
-            .p3.d, .p3 .die{
+            .p2.d, .p2 .die, .card .taken2{
                 color:green;
             }
-            .p4.d, .p4 .die{
+            .p3.d, .p3 .die, .card .taken3{
                 color:orange;
             }
 
@@ -633,21 +665,21 @@
                 opacity:0.3;
             }
 
-            .turn1 .p1, .turn2 .p2, .turn3 .p3, .turn4 .p4{
+            .turn0 .p0, .turn1 .p1, .turn2 .p2, .turn3 .p3{
                 opacity:1;
                 pointer-events:auto;
             }
 
-            .turn1 .face.on{
+            .turn0 .face.on{
                 color:red;
             }
-            .turn2 .face.on{
+            .turn1 .face.on{
                 color:blue;
             }
-            .turn3 .face.on{
+            .turn2 .face.on{
                 color:green;
             }
-            .turn4 .face.on{
+            .turn3 .face.on{
                 color:orange;
             }
 
@@ -676,11 +708,10 @@
             <div style="display:none">
                 <div id="p" class="p">
                     <div class="name">
-                        P1
-
-                        <span class="score">
-                        Score: 0
-                    </span>
+                        P0
+                    </div>
+                    <div class="score">
+                        0
                     </div>
                     <div class="field">
                         <div class="die die0" id="d0" face="1" draggable="true" ondragstart="drag(0,this)" ontouchmove="touchmove(event)">
