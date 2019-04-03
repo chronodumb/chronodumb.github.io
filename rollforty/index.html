@@ -17,24 +17,28 @@
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
+                        "ai":true,
                     },
                     {
                         "name":"Player 2",
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
+                        "ai":true,
                     },
                     {
                         "name":"Player 3",
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
+                        "ai":true,
                     },
                     {
                         "name":"Player 4",
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
+                        "ai":true,
                     }
                 ],
                 deck: [],
@@ -166,7 +170,7 @@
 
                 setTimeout(function(){
                     turn();
-                },1000);
+                },2000);
 
 
             }
@@ -186,6 +190,7 @@
                 }
 
 
+                state.deck=combo.splice(0);
 
             }
 
@@ -197,7 +202,6 @@
 
             function shuffle(array) {
                 console.log("shuffle");
-                state.deck=combo.splice(0);
 
                 for (var i = array.length - 1; i > 0; i--) {
                     var j = Math.floor(Math.random() * (i + 1));
@@ -437,6 +441,19 @@
                             render();
                             prender();
 
+                            setTimeout(function(p){
+
+                                if (p.score > 40){
+                                    alert(p.name + " WINNER WINNER WINNER WINNER!");
+                                    if (confirm("Try again?")){
+                                        init();
+                                        return;
+                                    }
+                                }
+
+                            },200,p[t])
+
+
                             break;
                         }
                     }
@@ -534,10 +551,10 @@
                 position:absolute;
                 padding:2px;
                 top:0px;
-                right:80px;
+                right:75px;
                 text-align: right;
                 border:1px solid;
-                width:30px;
+                width:20px;
             }
 
             .options{
@@ -785,7 +802,7 @@
 
                     <div class="options">
 
-                        <!--<input type="button" value="Re-roll" class="reroll" onclick="reroll(1)"/>-->
+                        <input type="button" value="Re-roll" class="reroll" onclick="reroll(1)"/>
                         <input type="button" value="Undo" onclick="undo()"/>
                         <input type="button" value="End"  onclick="next()"/>
 
