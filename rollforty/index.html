@@ -17,7 +17,7 @@
                         "score":0,
                         "dice": [1,1,1,1,1,1],
                         "reroll":true,
-                        "ai":0,
+                        "ai":3,
                     },
                     {
                         "name":"Player 2",
@@ -156,6 +156,12 @@
                     console.log("save")
                     save = jQuery.extend(true, {}, state);
                     render();
+
+                    var a = state.players[state.turn].ai;
+                    if (a){
+                        ai(a);
+                    }
+
                 },2000);
 
             }
@@ -333,15 +339,23 @@
             }
 
 
+            var targetCard = -1;
+
             function drop(event){
                 console.log("dropped");
-                console.log($(event.target).attr("c"));
+                targetCard = ($(event.target).attr("c"));
 
                 bid($(event.target));
             }
 
             function bid(e){
-                var i = e.attr("c");
+                var i = 0;
+
+                if (e){
+                    i =  e.attr("c");
+                } else {
+                    i = targetCard;
+                }
 
                 var c = state.card[i];
                 console.log(c);
@@ -352,7 +366,7 @@
                 console.log(dragdie + " == " + x);
 
                 if (c.pattern.indexOf(x) < 0){
-                    sayno(e);
+                    if (e) sayno(e);
                 } else {
 
                     //check first, what else can he bid
@@ -386,7 +400,7 @@
                         prender()
 
                     } else{
-                        sayno(e);
+                        if (e) sayno(e);
                     }
 
 
@@ -448,7 +462,11 @@
                                     if (confirm("Try again?")){
                                         init();
                                         return;
+                                    } else {
+                                        return;
                                     }
+                                } else {
+                                    turn();
                                 }
 
                             },200,p[t])
@@ -461,15 +479,80 @@
                 }
 
 
-                turn();
-            }
-
-
-            function ai(){
-
 
             }
 
+
+            function ai(risk){
+                var t = state.turn;
+                var cards = state.card;
+                var player = state.players[t];
+
+                for (var i = 0; i < cards.length; i++){
+                    console.log("ai check this " + cards[i]);
+                    var carr = cards[i].pattern.split("").map(Number);
+
+                    //Go bid immediately if all dice matches!
+                    console.log(carr);
+                    console.log(player.dice);
+
+                    matches = 0;
+                    if (isMatch(player.dice, carr, cards[i].bid[t])){
+                        console.log("taking it!");
+                        for (var c = 0; c< player.dice.length; c++){
+                            dragdie = c;
+                            targetCard =  i;
+                            bid();
+                        }
+
+                    }
+
+                    if (matches * 5 > cards[i].point  && player.dice.length > risk ){ //check if matches > 2
+                        for (var c = 0; c< player.dice.length; c++){
+                            dragdie = c;
+                            targetCard =  i;
+                            bid();
+                        }
+                    }
+
+                    // for (var c = 0; c< player.dice.length; c++){
+                    //     dragdie = c;
+                    //     targetCard =  i;
+                    //     bid();
+                    // }
+                }
+
+                setTimeout(function(){
+                    next();
+                },1000)
+            }
+
+            var matches = 0;
+            function isMatch(p,c,x){
+                var xx = x.length>0 ? x.slice(0) : [];
+                var pp = p.slice(0).concat(xx).sort();
+                var cc = c.slice(0).sort();
+
+
+                console.log(pp);
+                console.log(cc);
+
+                for (var i=0;i<pp.length;i++){
+                    if (cc.includes(pp[i])){
+                        cc.splice(pp[0],1);
+                        matches++;
+                    }
+                }
+
+                console.log("subtracted")
+                console.log(cc);
+
+                if (cc.length == 0){
+                    return true;
+                } else {
+                    return false;
+                }
+            }
 
 
             $(document).ready(function(){

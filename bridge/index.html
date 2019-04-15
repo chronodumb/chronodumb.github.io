@@ -6,26 +6,25 @@
     <script>
 
 
-        var p = [1,2,3,4,5,6];
-        var e = [1,2,3,4,5,6];
+        var rarity = ["common","rare","epic","legendary","mythical"]
+        var rcolor = ["green","blue","purple","orange","red"]
 
         var h = {
-            1: {
-                "name":"A",
-                "stats":{
-                    "hp":100,
-
-
-                },
-                "skill":{
-                    "bash":{
-                        "type":"offense",
-
-                    }
-                },
+            "knight":{
+                "rare":"common",
+                "costume":null,
+                "weapon":"swotd"
+                "power":3,
+                "life":6,
+                "speed":3,
             }
-
         }
+
+        function test(){
+            console.log( e.every(r=>p.includes(r)) )
+        }
+
+        test();
 
     </script>
 </head>
