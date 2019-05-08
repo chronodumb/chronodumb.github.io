@@ -5,30 +5,142 @@
 
     <script>
 
-
         var rarity = ["common","rare","epic","legendary","mythical"]
         var rcolor = ["green","blue","purple","orange","red"]
 
-        var h = {
-            "knight":{
-                "rare":"common",
-                "costume":null,
-                "weapon":"swotd"
-                "power":3,
-                "life":6,
-                "speed":3,
-            }
-        }
-
-        function test(){
-            console.log( e.every(r=>p.includes(r)) )
-        }
-
-        test();
-
     </script>
+
+    <style>
+        .body{
+            padding:0;
+            margin:0;
+        }
+        .main {
+            width:100%;
+            padding:0;
+            margin:0;
+        }
+        .field {
+            border:1px solid;
+            height:200px;
+            min-width:600px;
+            max-width:1080px;
+            margin:0 auto;
+            text-align:center;
+            position:relative
+        }
+        .h {
+            width:64px;
+            height:64px;
+            border:1px solid;
+            position:absolute;
+            bottom:40px;
+        }
+
+        .a1{
+            right: 55%;
+        }
+        .a2{
+            right: 70%;
+        }
+        .a3{
+            right: 85%;
+        }
+
+        .e1{
+            left: 55%;
+        }
+        .e2{
+            left: 70%;
+        }
+        .e3{
+            left: 85%;
+        }
+
+        :root{
+            --dx:50px;
+            --dx2:90px;
+        }
+
+        @keyframes at {
+            0%{transform:translate(0,0) rotate(0)}
+            20%{transform:translate(var(--dx),-60px) rotate(-10deg)}
+            30%{transform:translate(var(--dx2),0px) rotate(30deg)}
+            70%{transform:translate(-10px, -10px) rotate(-10deg)}
+            100%{transform:translate(0,0) rotate(0)}
+        }
+
+        .anim-at.a1{
+            animation: at 1s;
+        }
+        .anim-at.a2{
+            animation: at 1.2s;
+        }
+        .anim-at.a3{
+            animation: at 1.4s;
+        }
+
+        .h .n{
+            position:absolute;
+            bottom:-20px;
+            width:100%;
+        }
+
+    </style>
 </head>
 <body>
+    <div class="main">
 
+        <div class="field">
+            <div class="h a1">
+                <div class="n">A</div>
+            </div>
+            <div class="h a2">
+                <div class="n">B</div>
+            </div>
+            <div class="h a3">
+                <div class="n">C</div>
+            </div>
+
+            <div class="h e1">
+                <div class="n">D</div>
+            </div>
+            <div class="h e2">
+                <div class="n">E</div>
+            </div>
+            <div class="h e3">
+                <div class="n">F</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        //test
+        $(".h").click(function(){
+            aa(this,".e1");
+            play(this,"anim-at",1000);
+        })
+
+        function play(e,c,t){
+            $(e).addClass(c);
+            setTimeout(function(){
+                $(e).removeClass(c);
+            },t)
+        }
+
+        //anims
+        function aa(a,e){
+            var d = $(e).offset().left - $(a).offset().left;
+            console.log(d);
+            document.documentElement.style.setProperty('--dx', d-70 + "px");
+            document.documentElement.style.setProperty('--dx2', d-30 + "px");
+
+        }
+
+
+
+    </script>
 </body>
 </html>
