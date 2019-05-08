@@ -65,19 +65,17 @@
         @keyframes at {
             0%{transform:translate(0,0) rotate(0)}
             20%{transform:translate(var(--dx),-60px) rotate(-10deg)}
-            30%{transform:translate(var(--dx2),0px) rotate(30deg)}
-            70%{transform:translate(-10px, -10px) rotate(-10deg)}
+            25%{transform:translate(var(--dx2),0px) rotate(30deg)}
+            60%{transform:translate(-10px, -10px) rotate(-10deg)}
             100%{transform:translate(0,0) rotate(0)}
         }
 
-        .anim-at.a1{
-            animation: at 1s;
-        }
-        .anim-at.a2{
-            animation: at 1.2s;
-        }
-        .anim-at.a3{
-            animation: at 1.4s;
+        @keyframes idle{
+            0%{transform: translate(0,0)}
+            70%{transform: translate(0,0px)}
+            76%{transform: translate(0,-5px)}
+            80%{transform: translate(0,0)}
+            100%{transform: translate(0,0)}
         }
 
         .h .n{
@@ -118,9 +116,18 @@
 
     <script>
         //test
+
+        $(".h").each(function(){
+            console.log(Math.random());
+            setTimeout(function(){
+                idle(this);
+            },1000);
+
+
+        })
+
         $(".h").click(function(){
-            aa(this,".e1");
-            play(this,"anim-at",1000);
+            aa(this,".e3");
         })
 
         function play(e,c,t){
@@ -134,12 +141,25 @@
         function aa(a,e){
             var d = $(e).offset().left - $(a).offset().left;
             console.log(d);
-            document.documentElement.style.setProperty('--dx', d-70 + "px");
-            document.documentElement.style.setProperty('--dx2', d-30 + "px");
+            document.documentElement.style.setProperty('--dx', d-80 + "px");
+            document.documentElement.style.setProperty('--dx2', d-40 + "px");
 
+            var t = (d)/200;
+
+            $(a).css("animation","at " + t + "s")
+            setTimeout(function(){
+                idle(a);
+            },t*1000)
         }
 
+        function idle(a){
+            $(a).css("animation","idle 3s infinite");
+            console.log("idle")
+        }
 
+        function rnd(max) {
+            return Math.random() * max;
+        }
 
     </script>
 </body>
