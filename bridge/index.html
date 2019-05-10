@@ -5,8 +5,8 @@
 
     <script>
 
-        var rarity = ["common","rare","epic","legendary","mythical"]
-        var rcolor = ["green","blue","purple","orange","red"]
+        var rarity = ["common","advanced","rare","epic","legendary","mythical"]
+        var rcolor = ["white","green","blue","purple","orange","red"]
 
     </script>
 
@@ -117,13 +117,11 @@
     <script>
         //test
 
-        $(".h").each(function(){
-            console.log(Math.random());
+        $(".h").each(function(i,n){
             setTimeout(function(){
-                idle(this);
-            },1000);
-
-
+                $(n).css("animation","idle 5s infinite");
+                console.log(n);
+            },(Math.random()*i*1000)+(i*500));
         })
 
         $(".h").click(function(){
