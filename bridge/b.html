@@ -8,26 +8,43 @@
         var color = ["white","green","blue","purple","orange","red","gold"]
         //var faction = ["red","orange","yellow","purple","blue","green"]
 
-        var heroes = {
+        var unit = {
             "warrior" : {
                 name : "Warrior",
-                hp : 5,
+                hp : 4,
                 at : 2,
                 rare : 0,
-                desc : "",
-                skill : "battlecry",
+                skill : ["rage"],
+                tag : [],
             },
             "shieldbearer" : {
                 name : "Shieldbearer",
-                hp : 8,
-                at : 0,
+                hp : 5,
+                at : 1,
                 rare : 0,
-                desc : "",
-                skill : "taunt",
+                ability : ["charge"],
+            },
+            "mage" : {
+                name : "mage",
+                hp : 3,
+                at : 2,
+                ability : ["unstable"]
+            },
+            "archer" : {
             }
         }
 
-        var skills = {
+        var ability = {
+            "rage" : {
+
+            },
+            "charge" : {
+
+            },
+            "ranged" : {
+
+            }
+
         }
 
         function test(){
