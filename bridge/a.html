@@ -15,6 +15,10 @@
             },
         }
 
+        var p = "a";
+        var o = "e";
+        var actor = {};
+
         var tx = ["","melee","ranged"];
 
         var report={
@@ -70,8 +74,6 @@
             console.log("turn " + state.t);
             console.log(state.field)
 
-            var p = "a";
-            var o = "e"
             if (state.t%2){
                 p = "e";
                 o = "a";
@@ -84,26 +86,11 @@
             }
 
             for (var i = 0; i < state.field[p].length; i++){
-                var c = state.field[p][i];
+                actor = state.field[p][i];
 
                 for(var x = 0; x < c.skills.length; x++) {
-                    active(c.skills[x]); //do skill here
+                    action(c.skills[x]); //do skill here
                 }
-
-                // var x = -1;
-                //
-                // if (state.field[o].length > 0){
-                //     x = 0;
-                // }
-                //
-                // if (c.type == 2){
-                //     x = state.field[o].length-1;
-                // }
-                //
-                // if (x >= 0) {
-                //     var d = state.field[o][x];
-                //     console.log( c.name + tx[c.type] + d.name);
-                // }
             }
 
             console.log(state.field)
@@ -112,9 +99,30 @@
                 turn();
         }
 
-        function active(){
-            console.log("melee")
+        function active(c){
+            console.log(c)
+            switch(c){
+                case "melee":
+                    break;
+                case "ranged":
+
+
+
+
+                    break;
+            }
         }
+
+        function target(c,x){
+            switch(c) {
+                case "self" :
+                    return [actor];
+                    break;
+            }
+
+
+        }
+
 
         function str(obj){
             return JSON.stringify(obj);
