@@ -1,0 +1,142 @@
+<html>
+<head>
+
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+
+        var state = {
+            a : [],
+            e : [],
+            t : 0,
+            field : {
+                a: [],
+                e: [],
+            },
+        }
+
+        var report={
+            turns:[
+                [
+
+                ]
+            ]
+        };
+
+        var skills = {
+            "melee" : function(){
+                console.log("melee")
+            }
+        }
+
+        $(document).ready(function(){
+            genTest()
+        })
+
+        function genTest(){
+
+            state.a = testDeck(state.a);
+            state.e = testDeck(state.e);
+
+
+            console.log(state.a);
+            console.log(state.e);
+
+            shuffle(state.a);
+            shuffle(state.e);
+
+
+            turn();
+        }
+
+
+        function testDeck(d){
+            for (var i = 0; i<12; i++) {
+                d.push(testCard());
+            }
+            return d;
+        }
+
+        function testCard(){
+            var a = roll(4)+1;
+            var c = {name:rndlettter(4),hp:10-a,atk:a,skill:["melee"]}
+            return c;
+        }
+
+        function turn(){
+            state.t++;
+            console.log("turn " + state.t);
+
+            var p = "a";
+            var o = "e"
+            if (state.t%2){
+                p = "e";
+                o = "a";
+            }
+
+            if (state.field[p].length < 3 && state[p].length > 0){
+                var c = draw(state[p]);
+                console.log("summon " + c.name)
+                state.field[p].push(c);
+            }
+
+            for (var i = 0; i < state.field[p].length; i++){
+                var c = state.field[p][i];
+
+                for (var i = 0; i < c.skill.length; i++){
+                    use(c.skill[i])
+                }
+
+            }
+
+            log();
+        }
+
+        function use(s){
+            skills[s]();
+        }
+
+        function draw(d){
+            var c = d.splice(0,1)[0];
+            console.log(c);
+            return c;
+        }
+
+        function rndlettter(length){
+            var result           = '';
+            var characters       = 'abcdefghijklmnopqrstuvwxyz';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * ((max - 1) + 1) + 1);
+        }
+
+        function shuffle(array) {
+            console.log("shuffle");
+
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function log(){
+            $("#log").html("");
+        }
+
+
+    </script>
+</head>
+<body>
+    <div id="log">
+
+    </div>
+</body>
+</html>
