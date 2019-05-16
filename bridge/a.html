@@ -88,9 +88,11 @@
             for (var i = 0; i < state.field[p].length; i++){
                 actor = state.field[p][i];
 
+                /*
                 for(var x = 0; x < c.skills.length; x++) {
                     action(c.skills[x]); //do skill here
                 }
+                */
             }
 
             console.log(state.field)
@@ -137,7 +139,8 @@
 
         function rndlettter(length){
             var result           = '';
-            var characters       = 'abcdefghijklmnopqrstuvwxyz';
+            //var characters       = 'abcdefghijklmnopqrstuvwxyz';
+            var characters = "123456789";
             var charactersLength = characters.length;
             for ( var i = 0; i < length; i++ ) {
                 result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -163,6 +166,8 @@
         function log(){
             $("#log").html("");
         }
+
+        console.log(rndlettter(32))
 
 
     </script>
