@@ -38,8 +38,12 @@ $(document).ready(function() {
                 cardsCounter++;
                 if (cardsCounter === numOfCards) {
                     cardsCounter = 0;
+
                     $(".card").removeClass("below");
                 }
+
+                $(".card").toggleClass("current next");
+                draw();
             }, 300);
         }
 

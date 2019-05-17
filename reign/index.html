@@ -5,13 +5,112 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/swipe.js"></script>
     <link rel="stylesheet" type="text/css" href="css/swipe.css" ></link>
+
+    <script>
+        let stats = [5,5,5,5];
+        let deck = [];
+
+        const arrSum = arr => arr.reduce((a,b) => a + b, 0)
+
+        $(document).ready(function(){
+            init();
+        })
+        function init(){
+            deck = gentest(20);
+            shuffle(deck);
+
+            draw();
+        }
+
+        function update(){
+            $(".icon").each(function(i){
+                $(this).css({
+                    "background":"-webkit-linear-gradient(top,#333 " +(((10 - stats[i]) / 10) * 100) + "%,white " + ( stats[i] / 10 * 100) + "%)",
+                    "-webkit-text-fill-color": "transparent",
+                    "-webkit-background-clip": "text",
+                });
+
+            })
+        }
+
+        function draw(){
+            var c = deck.splice(0,1)[0];
+            console.log(c);
+
+            if (deck.length == 0){
+                alert("dead end");
+                return;
+            }
+            var n = deck[0];
+
+            console.log("current " + c.name);
+
+            $(".card.current .card__we").html(c.name);
+            $(".card.next .card__we").html(n.name);
+            $(".story").html(c.text);
+
+            update();
+        }
+
+        function gentest(size){
+            let deck = [];
+            for (let i = 0; i < size; i++) {
+                let yes = [-1,0,0,1];
+                shuffle(yes);
+                let no = [-1,0,0,1];
+                shuffle(no);
+
+                let card = {
+                    name : "Test " + i,
+                    text : "This is a random test card " + rnda(5) + " " + rnda(5) + "?",
+                    yesText : rnda(5) + "?",
+                    yes : yes,
+                    noText : rnda(5) + "!",
+                    no : no,
+                    special: null,
+                    img: null,
+                }
+                deck.push(card);
+            }
+            return deck;
+        }
+
+        function rnda(length){
+            var result           = '';
+            var characters       = 'abcdefghijklmnopqrstuvwxyz';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+    </script>
+
+
+
+
 </head>
 <body>
     <div class="main">
-    <div class="playbox">
+        <div class="playbox">
         <div class="stats">
             <div class="icon icon1">
-                A
+                <span>A</span>
             </div>
             <div class="icon icon2">
                 B
@@ -25,9 +124,9 @@
 
         </div>
         <div class="story">
-            Hello, this is story text testing.
+            <!--Hello, this is story text testing.
             Testing testing testing testing testing.
-            This should fit up to 3 lines comfortably.
+            This should fit up to 3 lines comfortably.-->
         </div>
         <div class="story yes">
             Yes.
@@ -37,25 +136,25 @@
         </div>
         <div class="content">
             <div class="card-cont">
-                <div class="card">
+                <div class="card next">
                     <div class="card__top blue">
                         <div class="card__img"></div>
-                        <p class="card__name">Hungry cat 2</p>
+                        <p class="card__name">Hungry cat</p>
                     </div>
                     <div class="card__btm">
-                        <p class="card__we">Whatever</p>
+                        <p class="card__we"></p>
                     </div>
                     <div class="card__choice m--reject"></div>
                     <div class="card__choice m--like"></div>
                     <div class="card__drag"></div>
                 </div>
-                <div class="card">
+                <div class="card current">
                     <div class="card__top purple">
                         <div class="card__img"></div>
                         <p class="card__name">Hungry cat</p>
                     </div>
                     <div class="card__btm">
-                        <p class="card__we">Whatever</p>
+                        <p class="card__we"></p>
                     </div>
                     <div class="card__choice m--reject"></div>
                     <div class="card__choice m--like"></div>
@@ -63,12 +162,13 @@
                 </div>
             </div>
         </div>
-        <p class="tip">Swipe left or right</p>
+
         <div class="pleaserotate">
             Please rotate to portrait mode
         </div>
 
-    </div>
+        </div>
+        <div class="tip">Swipe left or right</div>
     </div>
 </body>
 
