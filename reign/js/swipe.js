@@ -13,7 +13,7 @@ $(document).ready(function() {
         deg = pullDeltaX / 10;
         $card.css("transform", "translateX("+ pullDeltaX +"px) rotate("+ deg +"deg)");
 
-        var opacity = pullDeltaX / 100;
+        var opacity = pullDeltaX / 50;
         var rejectOpacity = (opacity >= 0) ? 0 : Math.abs(opacity);
         var likeOpacity = (opacity <= 0) ? 0 : opacity;
         $cardReject.css("opacity", rejectOpacity);
