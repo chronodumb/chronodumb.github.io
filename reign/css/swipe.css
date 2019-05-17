@@ -5,40 +5,75 @@
 }
 html, body {
   font-size: 62.5%;
+  overflow: hidden;
 }
 body {
   background: #63bdf7;
-  overflow: hidden;
+  padding:0;
+  margin:0;
 }
-.demo {
+.main {
+  width:100%;
+  padding:0;
+  margin:0;
+}
+/*.demo {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 30.6rem;
+  width: 100rem;
   height: 54rem;
   margin-left: -15.3rem;
   margin-top: -27rem;
   background: #f6f6f5;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}*/
+.playbox {
+  position: relative;
+  width:100%;
+  max-width:500px;
+  height:100%;
+  padding:0;
+  margin:0 auto;
+  background: #f6f6f5;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
-.demo__header {
-  height: 6rem;
+.stats {
+  height: 8rem;
   background: #002942;
+  text-align:center;
 }
-.demo__content {
+.icon{
+  height:6rem;
+  width:6rem;
+  display:inline-block;
+  font-size:6rem;
+  color:white;
+  margin:1%;
+}
+.story{
+  height: 10rem;
+  opacity: 0.8;
+  color:black;
+  font-size:2rem;
+  line-height:1.3;
+  text-align:center;
+  padding:1.5rem;
+}
+.content {
   overflow: hidden;
   position: relative;
   height: 48rem;
-  padding-top: 4.5rem;
+  padding-top: 3rem;
   user-select: none;
 }
-.demo__card-cont {
+.card-cont {
   position: relative;
   width: 24rem;
   height: 32rem;
   margin: 0 auto 5rem;
 }
-.demo__card {
+.card {
   z-index: 2;
   position: absolute;
   left: 0;
@@ -47,49 +82,49 @@ body {
   height: 100%;
   transform-origin: 50% 100%;
 }
-.demo__card.reset {
+.card.reset {
   transition: transform 0.3s;
   transform: translateX(0) !important;
 }
-.demo__card.reset .demo__card__choice {
+.card.reset .card__choice {
   transition: opacity 0.3s;
   opacity: 0 !important;
 }
-.demo__card.inactive {
+.card.inactive {
   transition: transform 0.3s;
 }
-.demo__card.to-left {
+.card.to-left {
   transform: translateX(-30rem) rotate(-30deg) !important;
 }
-.demo__card.to-right {
+.card.to-right {
   transform: translate(30rem) rotate(30deg) !important;
 }
-.demo__card.below {
+.card.below {
   z-index: 1;
 }
-.demo__card__top {
+.card__top {
   height: 20.5rem;
   padding-top: 4rem;
 }
-.demo__card__top.purple {
+.card__top.purple {
   background: #7132b9;
 }
-.demo__card__top.blue {
+.card__top.blue {
   background: #248cb6;
 }
-.demo__card__top.indigo {
+.card__top.indigo {
   background: #303f9f;
 }
-.demo__card__top.cyan {
+.card__top.cyan {
   background: #26c6da;
 }
-.demo__card__top.lime {
+.card__top.lime {
   background: #afb42b;
 }
-.demo__card__top.brown {
+.card__top.brown {
   background: #795548;
 }
-.demo__card__img {
+.card__img {
   overflow: hidden;
   width: 10rem;
   height: 10rem;
@@ -98,22 +133,22 @@ body {
   border: 0.5rem solid #fff;
   background-size: cover;
 }
-.demo__card__name {
+.card__name {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
   color: #fff;
 }
-.demo__card__btm {
+.card__btm {
   height: 11.5rem;
   background: #fff;
 }
-.demo__card__we {
+.card__we {
   text-align: center;
   font-size: 2.2rem;
   line-height: 11.5rem;
 }
-.demo__card__choice {
+.card__choice {
   position: absolute;
   left: 0;
   top: 0;
@@ -121,7 +156,7 @@ body {
   height: 100%;
   opacity: 0;
 }
-.demo__card__choice:before {
+.card__choice:before {
   content: "";
   position: absolute;
   left: 50%;
@@ -133,7 +168,7 @@ body {
   border-radius: 50%;
   box-shadow: -2rem -3rem #fff, 2rem -3rem #fff;
 }
-.demo__card__choice:after {
+.card__choice:after {
   content: "";
   position: absolute;
   left: 50%;
@@ -146,16 +181,16 @@ body {
   border-top-left-radius: 1.5rem;
   border-top-right-radius: 1.5rem;
 }
-.demo__card__choice.m--reject {
+.card__choice.m--reject {
   background: #ff945a;
 }
-.demo__card__choice.m--like {
+.card__choice.m--like {
   background: #b1da96;
 }
-.demo__card__choice.m--like:after {
+.card__choice.m--like:after {
   transform: scaleY(-1);
 }
-.demo__card__drag {
+.card__drag {
   z-index: 5;
   position: absolute;
   left: 0;
@@ -164,7 +199,28 @@ body {
   height: 100%;
   cursor: grab;
 }
-.demo__tip {
+.tip {
   text-align: center;
   font-size: 2.2rem;
+  background: #090909;
+  color:white;
+  height:8rem;
+  padding:1rem;
+  opacity:0.6;
+  position:absolute;
+  width:100%;
+  bottom:0px;
+  z-index:20;
+}
+@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
+  html {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height:100vw;
+    overflow-x: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
 }

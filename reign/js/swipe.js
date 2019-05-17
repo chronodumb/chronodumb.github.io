@@ -18,6 +18,8 @@ $(document).ready(function() {
         var likeOpacity = (opacity <= 0) ? 0 : opacity;
         $cardReject.css("opacity", rejectOpacity);
         $cardLike.css("opacity", likeOpacity);
+
+        $(".tip").fadeOut();
     };
 
     function release() {
@@ -36,7 +38,7 @@ $(document).ready(function() {
                 cardsCounter++;
                 if (cardsCounter === numOfCards) {
                     cardsCounter = 0;
-                    $(".demo__card").removeClass("below");
+                    $(".card").removeClass("below");
                 }
             }, 300);
         }
@@ -47,19 +49,19 @@ $(document).ready(function() {
 
         setTimeout(function() {
             $card.attr("style", "").removeClass("reset")
-                .find(".demo__card__choice").attr("style", "");
+                .find(".card__choice").attr("style", "");
 
             pullDeltaX = 0;
             animating = false;
         }, 300);
     };
 
-    $(document).on("mousedown touchstart", ".demo__card:not(.inactive)", function(e) {
+    $(document).on("mousedown touchstart", ".card:not(.inactive)", function(e) {
         if (animating) return;
 
         $card = $(this);
-        $cardReject = $(".demo__card__choice.m--reject", $card);
-        $cardLike = $(".demo__card__choice.m--like", $card);
+        $cardReject = $(".card__choice.m--reject", $card);
+        $cardLike = $(".card__choice.m--like", $card);
         var startX =  e.pageX || e.originalEvent.touches[0].pageX;
 
         $(document).on("mousemove touchmove", function(e) {
