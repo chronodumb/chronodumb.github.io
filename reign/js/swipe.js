@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     var animating = false;
     var cardsCounter = 0;
-    var numOfCards = 6;
+    var numOfCards = 2;
     var decisionVal = 80;
     var pullDeltaX = 0;
     var deg = 0;
@@ -13,7 +13,7 @@ $(document).ready(function() {
         deg = pullDeltaX / 10;
         $card.css("transform", "translateX("+ pullDeltaX +"px) rotate("+ deg +"deg)");
 
-        var opacity = pullDeltaX / 50;
+        var opacity = pullDeltaX / 100;
         var rejectOpacity = (opacity >= 0) ? 0 : Math.abs(opacity);
         var likeOpacity = (opacity <= 0) ? 0 : opacity;
         $cardReject.css("opacity", rejectOpacity);
