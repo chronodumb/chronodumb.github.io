@@ -26,8 +26,10 @@ $(document).ready(function() {
 
         if (pullDeltaX >= decisionVal) {
             $card.addClass("to-right");
+            update(1);
         } else if (pullDeltaX <= -decisionVal) {
             $card.addClass("to-left");
+            update(2);
         }
 
         if (Math.abs(pullDeltaX) >= decisionVal) {

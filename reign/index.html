@@ -9,6 +9,9 @@
     <script>
         let stats = [5,5,5,5];
         let deck = [];
+        let discard = [];
+        let current = {};
+        let stage = 1;
 
         const arrSum = arr => arr.reduce((a,b) => a + b, 0)
 
@@ -22,34 +25,100 @@
             draw();
         }
 
-        function update(){
-            $(".icon").each(function(i){
-                $(this).css({
-                    "background":"-webkit-linear-gradient(top,#333 " +(((10 - stats[i]) / 10) * 100) + "%,white " + ( stats[i] / 10 * 100) + "%)",
-                    "-webkit-text-fill-color": "transparent",
-                    "-webkit-background-clip": "text",
-                });
+        function update(opt){
+            console.log(opt)
+            if (opt == 1){
+                modify(current.yes);
+            } else if (opt == 2){
+                modify(current.no);
+            } else {
+                console.log("do nothing");
+            }
 
-            })
+            render();
+            console.log(stats);
         }
+
+        function modify(mods){
+            for (let i =0; i < stats.length; i++){
+                stats[i] += mods[i];
+                if (mods[i] > 0){
+                    $(".icon"+i).addClass("hit");
+                } else if (mods[i] < 0){
+                    $(".icon"+i).addClass("heal");
+                }
+                setTimeout(function(){
+                    $(".icon").removeClass("hit heal");
+                },1000);
+            }
+        }
+
+        function render(){
+            $(".n").each(function(i){
+               $(this).html(stats[i]);
+
+               if (stats[i] <= 0){
+                   //alert("dead");
+               } else if (stats[i] >= 10){
+                   //alert("dead")
+               }
+
+               if (stats[i]<3){
+                   $(".icon"+i).addClass("low");
+               } else if (stats[i]>7){
+                   $(".icon"+i).addClass("high");
+               } else {
+                   $(".icon"+i).removeClass("high low");
+               }
+            });
+        }
+
+        // function update(){
+        //     $(".icon").each(function(i){
+        //         $(this).css({
+        //             "background":"-webkit-linear-gradient(top,#333 " +(((10 - stats[i]) / 10) * 100) + "%,white " + ( stats[i] / 10 * 100) + "%)",
+        //             "-webkit-text-fill-color": "transparent",
+        //             "-webkit-background-clip": "text",
+        //         });
+        //
+        //     })
+        // }
 
         function draw(){
             var c = deck.splice(0,1)[0];
             console.log(c);
+            discard.push(c);
 
             if (deck.length == 0){
-                alert("dead end");
-                return;
+                alert("shuffling");
+                deck = discard;
+                shuffle(deck);
             }
-            var n = deck[0];
+            // var n = deck[0];
 
             console.log("current " + c.name);
+            current = c;
 
             $(".card.current .card__we").html(c.name);
-            $(".card.next .card__we").html(n.name);
-            $(".story").html(c.text);
+            // $(".card.next .card__we").html(n.name);
+            //$(".story").html(c.text);
+            rewrite(c.text);
 
-            update();
+            $(".card.current").addClass("flipping")
+            setTimeout(function(){
+                $(".card.current").toggleClass("flipping")
+
+            },500);
+
+            //update();
+        }
+
+        function rewrite(text){
+            $(".story").removeClass("show");
+            $(".story").html(text);
+            setTimeout(function(){
+                $(".story").addClass("show");
+            },300);
         }
 
         function gentest(size){
@@ -109,34 +178,33 @@
     <div class="main">
         <div class="playbox">
         <div class="stats">
-            <div class="icon icon1">
+            <div class="icon icon0">
                 <span>A</span>
+                <div class="n n0">5</div>
+            </div>
+            <div class="icon icon1">
+                B
+                <div class="n n1">5</div>
             </div>
             <div class="icon icon2">
-                B
+                C
+                <div class="n n2">5</div>
             </div>
             <div class="icon icon3">
-                C
-            </div>
-            <div class="icon icon4">
                 D
+                <div class="n n3">5</div>
             </div>
 
         </div>
-        <div class="story">
+        <div class="story reveal">
             <!--Hello, this is story text testing.
             Testing testing testing testing testing.
             This should fit up to 3 lines comfortably.-->
         </div>
-        <div class="story yes">
-            Yes.
-        </div>
-        <div class="story no">
-            No.
-        </div>
         <div class="content">
             <div class="card-cont">
                 <div class="card next">
+                    <div class="back">
                     <div class="card__top blue">
                         <div class="card__img"></div>
                         <p class="card__name">Hungry cat</p>
@@ -147,8 +215,13 @@
                     <div class="card__choice m--reject"></div>
                     <div class="card__choice m--like"></div>
                     <div class="card__drag"></div>
+                    </div>
+                    <div class="front">
+                    </div>
                 </div>
                 <div class="card current">
+                    <div class="flipper">
+                    <div class="back">
                     <div class="card__top purple">
                         <div class="card__img"></div>
                         <p class="card__name">Hungry cat</p>
@@ -159,6 +232,10 @@
                     <div class="card__choice m--reject"></div>
                     <div class="card__choice m--like"></div>
                     <div class="card__drag"></div>
+                    </div>
+                    <div class="front">
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
