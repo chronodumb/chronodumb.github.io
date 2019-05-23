@@ -6,6 +6,11 @@
     <script>
         let icon=["⚔","🏹","♥","$","🐱","💀"]
         let type=["sword","bow","potion","gold","monster","monster"] //todo: wands, spike, traps, relics, elite, boss
+        let weapons = {
+            "sword" : "⚔",
+            "bow" : "🏹",
+            "":"",
+        }
         let deck=[];
         let discard=[];
         let boss=[];
@@ -26,7 +31,7 @@
             power:0,
             hp: 8,
             maxhp: 8,
-            weapon:0,
+            weapon:"",
             gold:0,
         }
 
@@ -46,7 +51,6 @@
         }
 
         function play(){
-            console.log("turn " + turn);
 
             let c = $(".hero").attr("c");
             let m = getMoves(c);
@@ -58,31 +62,46 @@
                 }
             }
 
-            console.log(m);
 
         }
 
-        //NOTE: CC=YX
         function move(e){
-            let cc = $(e).attr("c").split("").map(Number);
+            let cc = $(".hero").attr("c").split("").map(Number);
+            let cc2 = $(e).attr("c").split("").map(Number);
             let d = Number($(e).attr("d"));
-            let target = field[cc[0]][cc[1]];
-            /*switch (target.type){
+
+            let target = field[cc2[0]][cc2[1]];
+            console.log(target.type);
+
+            switch (target.type){
                 case "monster":
                     hero.power -= target.power;
-                    if (hero.power >= 0){
-                        displace(cc,d);
-                    } else {
+                    if (hero.power <= 0) {
                         hero.hp += hero.power;
                         hero.power = 0;
-                        hero.weapon = 0;
-                        displace(cc,d);
+                        hero.weapon = "";
                     }
                     break;
+                case "gold":
+                    hero.gold += target.power;
+                    break;
+                case "potion":
+                    hero.hp += target.power;
+                    if (hero.hp > hero.maxhp)
+                        hero.hp = hero.maxhp;
+                    break;
                 case "sword":
+                case "bow":
+                    if (hero.weapon == target.type){
+                        hero.power += target.power;
+                    } else {
+                        hero.weapon = target.type;
+                        hero.power = target.power;
+                    }
                     break;
 
-            }*/
+            }
+
             displace(cc,d);
         }
 
@@ -91,7 +110,6 @@
             let y = cc[0];
             let x = cc[1];
 
-            console.log("displace " + x + " : "+ y + " -- " + dir);
 
             switch (dir){
                 case 0:
@@ -107,7 +125,6 @@
                     break;
                 case 2:
                     while (y >= 0) {
-                        console.log(x + " " + y)
                         field[y+1].splice(x, 1, field[y][x]);
                         y--;
                     }
@@ -119,7 +136,6 @@
                     break;
             }
 
-            console.log(field);
 
             render();
 
@@ -128,7 +144,6 @@
 
         function getMoves(c){
             let cc = c.split('').map(Number);
-            console.log(cc)
             let left = cc[0] + '' + next(cc[1],-1);
             let right = cc[0]  + '' + next(cc[1],1);
             let down = next(cc[0],1)  + '' + cc[1];
@@ -138,8 +153,8 @@
         }
 
         function next(c,i){
-            let r = Number(c)+i;
-            return (r>0 && r<=4) ? r : null;
+            let r = c+i;
+            return (r>=0 && r<=4) ? r : null;
         }
 
 
@@ -155,7 +170,6 @@
         }*/
 
         function place(){
-            console.log(deck);
 
             for (let y= 0; y<4; y++){
                 for (let x= 0; x<4; x++){
@@ -187,17 +201,20 @@
                 }
             }
 
+            $(".s1").html(hero.hp + "/" + hero.maxhp);
+            $(".s2").html(hero.gold);
+            $(".s3").html(weapons[hero.weapon]);
+            $(".s4").html(hero.power);
+
             play();
         }
 
 
         function draw(){
             var c = deck.splice(0,1)[0];
-            console.log(c);
             discard.push(c);
 
             if (deck.length == 0){
-                alert("shuffling");
                 deck = discard;
                 shuffle(deck);
             }
@@ -292,7 +309,6 @@
                     break;
                 case 2:
                     while (y >= 0) {
-                        console.log(x + " " + y)
                         test[y+1].splice(x, 1, test[y][x]);
                         y--;
                     }
@@ -305,7 +321,6 @@
             }
 
 
-            console.log(test);
         }
 
         function clone(obj) {
@@ -332,6 +347,11 @@
             margin:auto;
             margin-bottom:10px;
             font-size:1rem;
+            display: grid;
+            grid-template-areas:
+                'l1 s1 l2 s2'
+                'l3 s3 l4 s4'
+            ;
         }
 
         .grid{
@@ -380,6 +400,10 @@
         .block{
             display:block
         }
+
+        .horz{
+            display:inline-block;
+        }
     </style>
 
 
@@ -387,8 +411,14 @@
 <body>
     <div class="main">
         <div class="stat">
-            <div class="block hp">HP 8/8</div>
-            <div class="block gold">Gold 0</div>
+            <div class="l1">HP</div>
+            <div class="s1">8/8</div>
+            <div class="l2">Gold</div>
+            <div class="s2">0</div>
+            <div class="l3">Wpn.</div>
+            <div class="s3"></div>
+            <div class="l4">Power</div>
+            <div class="s4">0</div>
         </div>
         <div class="grid">
             <div class="r00 slot" d="" c="00"></div>
