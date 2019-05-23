@@ -43,11 +43,9 @@
             shuffle(deck);
 
             place();
-            play();
         }
 
         function play(){
-            //getAvailableMoves
             console.log("turn " + turn);
 
             let c = $(".hero").attr("c");
@@ -66,10 +64,10 @@
 
         //NOTE: CC=YX
         function move(e){
-            let cc = $(e).attr("c").split("");
-            let d = $(e).attr("d");
+            let cc = $(e).attr("c").split("").map(Number);
+            let d = Number($(e).attr("d"));
             let target = field[cc[0]][cc[1]];
-            switch (target.type){
+            /*switch (target.type){
                 case "monster":
                     hero.power -= target.power;
                     if (hero.power >= 0){
@@ -84,41 +82,52 @@
                 case "sword":
                     break;
 
-            }
+            }*/
             displace(cc,d);
         }
 
-        //delete the target, then move everything to that direction
-        //get current cc
-        function displace(cc,d){
-            console.log(cc);
-            console.log(d);
-
+        //dir 0-up, 1-right, 2-down, 3-left
+        function displace(cc, dir){
             let y = cc[0];
             let x = cc[1];
 
-            console.log("UP")
-            while (y < 4){
-                y++;
-                field[x][y] = field[x][y+1];
-            }
+            console.log("displace " + x + " : "+ y + " -- " + dir);
 
-            switch(d){
-                case 0: //up
-                    console.log("UP")
-                    while (y < 4){
+            switch (dir){
+                case 0:
+                    while (y < field.length) {
+                        field[y - 1].splice(x, 1, field[y][x]);
                         y++;
-                        field[x][y] = field[x][y+1];
                     }
+                    field[y-1][x] = draw();
                     break;
-
+                case 1:
+                    field[y].splice(x+1,1);
+                    field[y].unshift(draw());
+                    break;
+                case 2:
+                    while (y >= 0) {
+                        console.log(x + " " + y)
+                        field[y+1].splice(x, 1, field[y][x]);
+                        y--;
+                    }
+                    field[y+1][x] = draw();
+                    break;
+                case 3:
+                    field[y].splice(x-1,1);
+                    field[y].push(draw());
+                    break;
             }
+
+            console.log(field);
 
             render();
+
         }
 
+
         function getMoves(c){
-            let cc = c.split('');
+            let cc = c.split('').map(Number);
             console.log(cc)
             let left = cc[0] + '' + next(cc[1],-1);
             let right = cc[0]  + '' + next(cc[1],1);
@@ -132,6 +141,8 @@
             let r = Number(c)+i;
             return (r>0 && r<=4) ? r : null;
         }
+
+
 
         /*function next(c,i){
             let r = Number(c)+i;
@@ -158,10 +169,11 @@
                 }
             }
             render();
-
         }
 
         function render(){
+            $(".slot").removeClass("hero glow " + type.join(" "));
+
             for (let y= 0; y<4; y++) {
                 for (let x = 0; x < 4; x++) {
                     if (field[x][y].type  == "hero") {
@@ -174,6 +186,8 @@
                     }
                 }
             }
+
+            play();
         }
 
 
@@ -228,10 +242,80 @@
             }
         }
 
+        //powerful tool indeed!
+        function listToMatrix(list, elementsPerSubArray) {
+            var matrix = [], i, k;
+
+            for (i = 0, k = -1; i < list.length; i++) {
+                if (i % elementsPerSubArray === 0) {
+                    k++;
+                    matrix[k] = [];
+                }
+
+                matrix[k].push(list[i]);
+            }
+
+            return matrix;
+        }
+
         function roll(max){
             return Math.floor(Math.random() * max);
         }
 
+
+        let test = [
+            [1,1,1,1],
+            [2,2,2,2],
+            [3,3,8,3],
+            [4,4,4,4],
+        ]
+
+        testDisplace([2,2],2);
+
+        //dir 0-up, 1-right, 2-down, 3-left
+        function testDisplace(target, dir){
+
+            let x = target[0];
+            let y = target[1];
+
+            switch (dir){
+                case 0:
+                    while (y < test.length) {
+                        test[y - 1].splice(x, 1, test[y][x]);
+                        y++;
+                    }
+                    test[y-1][x] = 0;
+                    break;
+                case 1:
+                    test[y].splice(x+1,1);
+                    test[y].unshift(0);
+                    break;
+                case 2:
+                    while (y >= 0) {
+                        console.log(x + " " + y)
+                        test[y+1].splice(x, 1, test[y][x]);
+                        y--;
+                    }
+                    test[y+1][x] = 0;
+                    break;
+                case 3:
+                    test[y].splice(x-1,1);
+                    test[y].push(0);
+                    break;
+            }
+
+
+            console.log(test);
+        }
+
+        function clone(obj) {
+            if (null == obj || "object" != typeof obj) return obj;
+            var copy = obj.constructor();
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+            }
+            return copy;
+        }
 
     </script>
 
@@ -256,10 +340,10 @@
             height:80vw;
             display: grid;
             grid-template-areas:
-                    'r11 r12 r13 r14'
-                    'r21 r22 r23 r24'
-                    'r31 r32 r33 r34'
-                    'r41 r42 r43 r44'
+                    'r01 r11 r21 r31'
+                    'r02 r12 r22 r32'
+                    'r03 r13 r23 r33'
+                    'r04 r14 r24 r34'
             ;
             grid-gap:10px;
             margin:auto;
