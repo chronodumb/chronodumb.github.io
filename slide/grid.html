@@ -15,8 +15,7 @@
         let discard=[];
         let boss=[];
         let turn = 0;
-        //let start = roll(15);
-        let start = 10;
+        let start = 0;
         let anim = [];
         let direction = ["up","right","down","left"];
 
@@ -46,6 +45,18 @@
         });
 
         function init(){
+            start = roll(15);
+            turn = 0;
+            anim=[];
+            hero = {
+                name:"H",
+                type:"hero",
+                power:0,
+                hp: 8,
+                maxhp: 8,
+                weapon:"",
+                gold:0,
+            }
             deck = gentest();
             shuffle(deck);
 
@@ -64,7 +75,7 @@
                 }
             }
 
-
+            restat();
         }
 
         let moving = false;
@@ -179,7 +190,9 @@
 
         function restat(){
             if (hero.hp < 0){
-                alert("dead");
+                alert("You died!\nScore: "+hero.gold + "\nPlay Again?");
+                init();
+                return;
             }
 
             $(".s1").html(hero.hp + "/" + hero.maxhp);
