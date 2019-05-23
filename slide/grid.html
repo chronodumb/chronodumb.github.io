@@ -17,6 +17,8 @@
         let turn = 0;
         //let start = roll(15);
         let start = 10;
+        let anim = [];
+        let direction = ["up","right","down","left"];
 
         let field = [
             [null,null,null,null],
@@ -65,7 +67,14 @@
 
         }
 
+        let moving = false;
+
+        //CC=YX
         function move(e){
+            $(".slot").removeClass("glow");
+
+            anim = [];
+
             let cc = $(".hero").attr("c").split("").map(Number);
             let cc2 = $(e).attr("c").split("").map(Number);
             let d = Number($(e).attr("d"));
@@ -73,48 +82,60 @@
             let target = field[cc2[0]][cc2[1]];
             console.log(target.type);
 
-            switch (target.type){
-                case "monster":
-                    hero.power -= target.power;
-                    if (hero.power <= 0) {
-                        hero.hp += hero.power;
-                        hero.power = 0;
-                        hero.weapon = "";
-                    }
-                    break;
-                case "gold":
-                    hero.gold += target.power;
-                    break;
-                case "potion":
-                    hero.hp += target.power;
-                    if (hero.hp > hero.maxhp)
-                        hero.hp = hero.maxhp;
-                    break;
-                case "sword":
-                case "bow":
-                    if (hero.weapon == target.type){
-                        hero.power += target.power;
-                    } else {
-                        hero.weapon = target.type;
-                        hero.power = target.power;
-                    }
-                    break;
+            anim.push([cc2[1],cc2[0],"gone"]);
+            anim.push([cc[1],cc[0],direction[d]]);
 
-            }
+            animate();
 
-            displace(cc,d);
+            setTimeout(function(){
+                switch (target.type){
+                    case "monster":
+                        hero.power -= target.power;
+                        if (hero.power <= 0) {
+                            hero.hp += hero.power;
+                            hero.power = 0;
+                            hero.weapon = "";
+                        }
+                        break;
+                    case "gold":
+                        hero.gold += target.power;
+                        break;
+                    case "potion":
+                        hero.hp += target.power;
+                        if (hero.hp > hero.maxhp)
+                            hero.hp = hero.maxhp;
+                        break;
+                    case "sword":
+                    case "bow":
+                        if (hero.weapon == target.type){
+                            hero.power += target.power;
+                        } else {
+                            hero.weapon = target.type;
+                            hero.power = target.power;
+                        }
+                        break;
+
+                }
+
+                displace(cc,d);
+            },500)
+
+
         }
+
 
         //dir 0-up, 1-right, 2-down, 3-left
         function displace(cc, dir){
             let y = cc[0];
             let x = cc[1];
 
+            // anim.push([cc2[1],cc2[0],"gone"])
 
             switch (dir){
                 case 0:
                     while (y < field.length) {
                         field[y - 1].splice(x, 1, field[y][x]);
+                        anim.push([x,y,"up"]);
                         y++;
                     }
                     field[y-1][x] = draw();
@@ -122,10 +143,15 @@
                 case 1:
                     field[y].splice(x+1,1);
                     field[y].unshift(draw());
+                    while (x>=0){
+                        anim.push([x,y,"right"]);
+                        x--;
+                    }
                     break;
                 case 2:
                     while (y >= 0) {
                         field[y+1].splice(x, 1, field[y][x]);
+                        anim.push([x,y,"down"]);
                         y--;
                     }
                     field[y+1][x] = draw();
@@ -133,12 +159,33 @@
                 case 3:
                     field[y].splice(x-1,1);
                     field[y].push(draw());
+                    while (x< field[y].length){
+                        anim.push([x,y,"left"]);
+                        x++;
+                    }
                     break;
             }
 
+            restat();
 
-            render();
 
+            animate();
+            setTimeout(function(){
+                play();
+            },1000);
+            //render();
+
+        }
+
+        function restat(){
+            if (hero.hp < 0){
+                alert("dead");
+            }
+
+            $(".s1").html(hero.hp + "/" + hero.maxhp);
+            $(".s2").html(hero.gold);
+            $(".s3").html(weapons[hero.weapon]);
+            $(".s4").html(hero.power);
         }
 
 
@@ -183,10 +230,30 @@
                 }
             }
             render();
+            setTimeout(function(){
+                play();
+            },100);
+        }
+
+        function animate(){
+
+            if (anim.length > 0){
+                for (let i = 0; i< anim.length; i++){
+                    console.log(anim[i])
+                    $(".r"+anim[i][1]+""+anim[i][0]).addClass(anim[i][2]);
+                }
+
+                setTimeout(function(){
+                    $(".slot").removeClass("up down left right gone");
+                    render();
+                },1000);
+            } else {
+                render();
+            }
         }
 
         function render(){
-            $(".slot").removeClass("hero glow " + type.join(" "));
+            $(".slot").removeClass("hero "+ type.join(" ") );
 
             for (let y= 0; y<4; y++) {
                 for (let x = 0; x < 4; x++) {
@@ -200,13 +267,6 @@
                     }
                 }
             }
-
-            $(".s1").html(hero.hp + "/" + hero.maxhp);
-            $(".s2").html(hero.gold);
-            $(".s3").html(weapons[hero.weapon]);
-            $(".s4").html(hero.power);
-
-            play();
         }
 
 
@@ -287,7 +347,7 @@
             [4,4,4,4],
         ]
 
-        testDisplace([2,2],2);
+        /*testDisplace([2,2],2);
 
         //dir 0-up, 1-right, 2-down, 3-left
         function testDisplace(target, dir){
@@ -321,7 +381,7 @@
             }
 
 
-        }
+        }*/
 
         function clone(obj) {
             if (null == obj || "object" != typeof obj) return obj;
@@ -380,11 +440,76 @@
         }
 
         .slot{
+            background:white;
             border:1px solid;
             pointer-events:none;
             font-size:0.8rem;
             cursor: pointer;
+            transform: translate(0,0),
         }
+
+        .slot.up{
+            animation: 1s up ;
+        }
+
+        .slot.down{
+            animation: 1s down ;
+        }
+
+        .slot.left{
+            animation: 1s left ;
+        }
+
+        .slot.right{
+            animation: 1s right ;
+        }
+
+        .slot.gone{
+            animation: 1s gone ;
+        }
+
+        @keyframes gone{
+            0%{
+                z-index:-1;
+            } 30%{
+                transform: rotate(-20deg);
+            } 60%{
+                transform: rotate(20deg);
+            } 100% {
+                transform: rotate(0deg);
+                opacity:0.2;
+            }
+        }
+
+        @keyframes up{
+            0% {
+                transform: translateY(0);
+            } 100% {
+                transform: translateY(-120%);
+            }
+        }
+        @keyframes down{
+            0% {
+                transform: translateY(0);
+            } 100% {
+                  transform: translateY(120%);
+              }
+        }
+        @keyframes left{
+            0% {
+                transform: translateX(0);
+            } 100% {
+                  transform: translateX(-120%);
+              }
+        }
+        @keyframes right{
+            0% {
+                transform: translateX(0);
+            } 100% {
+                  transform: translateX(120%);
+              }
+        }
+
 
         .hero{
             border-color:blue;
