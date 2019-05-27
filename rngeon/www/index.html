@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' gap:; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>Hello World</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+        let icon=["⚔","🏹","♥","$","🐱","💀","!"] //"?","💩","💣"
+        let type=["sword","bow","potion","gold","monster","monster","trap"] //"chest","poison","bomb" //todo: wands, spike, traps, relics, elite, boss, chest
+        let weapons = {
+            "sword" : "⚔",
+            "bow" : "🏹",
+            "":"",
+        }
+        let deck=[];
+        let discard=[];
+        let boss=[];
+        let turn = 0;
+        let start = 0;
+        let anim = [];
+        let floor = 0;
+        let direction = ["up","right","down","left"];
+
+        let field = [
+            [null,null,null,null],
+            [null,null,null,null],
+            [null,null,null,null],
+            [null,null,null,null],
+        ]
+
+        let hero = {
+            name:"H",
+            type:"hero",
+            power:0,
+            hp: 8,
+            maxhp: 8,
+            weapon:"",
+            gold:0,
+        }
+
+        $(document).ready(function(){
+            init();
+
+            $(".slot").click(function(e){
+                move(e.currentTarget);
+            })
+        });
+
+        function init(){
+            start = roll(15);
+            turn = 0;
+            anim=[];
+            floor=0;
+            hero = {
+                name:"H",
+                type:"hero",
+                power:0,
+                hp: 8,
+                maxhp: 8,
+                weapon:"",
+                gold:0,
+            }
+            deck = gentest();
+            shuffle(deck);
+
+            place();
+        }
+
+        function play(){
+            onturn();
+            restat();
+
+            setTimeout(function(){
+                let c = $(".hero").attr("c");
+                let m = getMoves(c);
+
+                for (let i =0; i < m.length; i++){
+                    if (m[i]) {
+                        $(".r" + m[i]).addClass("glow")
+                        $(".r" + m[i]).attr("d",i);
+                    }
+                }
+            },100);
+
+        }
+
+        function onturn(){
+            for (let y= 0; y<4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    let c = field[y][x];
+                    if (c.type=="poison"){
+                        c.power++;
+                        render();
+                    }
+                    if (c.type=="trap" && (turn%2==0)){
+                        $(".r"+y+x).addClass("off");
+                    }
+                    if (c.type=="bomb"){
+                        c.flag = Number(c.flag)-1;
+                        $(".r"+y+x).append();
+                    }
+                }
+            }
+            turn++;
+        }
+
+
+        //CC=YX
+        function move(e){
+            $(".slot").removeClass("glow");
+
+            anim = [];
+
+            let cc = $(".hero").attr("c").split("").map(Number);
+            let cc2 = $(e).attr("c").split("").map(Number);
+            let d = Number($(e).attr("d"));
+
+            let target = field[cc2[0]][cc2[1]];
+            console.log(target.type);
+
+            if (target.type == "chest"){
+                field[cc2[0]][cc2[1]] = draw();
+                target = field[cc2[0]][cc2[1]];
+                render();
+            }
+
+            anim.push([cc2[1],cc2[0],"gone"]);
+            anim.push([cc[1],cc[0],direction[d]]);
+
+            animate();
+
+            setTimeout(function(){
+                switch (target.type){
+                    case "monster":
+                        hero.power -= target.power;
+                        if (hero.power <= 0) {
+                            hero.hp += hero.power;
+                            hero.power = 0;
+                            hero.weapon = "";
+                        }
+                        break;
+                    case "gold":
+                        hero.gold += target.power;
+                        break;
+                    case "potion":
+                        hero.hp += target.power;
+                        if (hero.hp > hero.maxhp)
+                            hero.hp = hero.maxhp;
+                        break;
+                    case "sword":
+                    case "bow":
+                        if (hero.weapon == target.type){
+                            hero.power += target.power;
+                        } else {
+                            hero.weapon = target.type;
+                            hero.power = target.power;
+                        }
+                        break;
+                    case "trap":
+                        if (!$(e).hasClass("off"))
+                            hero.hp -= target.power;
+                        break;
+                    case "chest":
+
+                }
+
+                displace(cc,d);
+            },500)
+
+        }
+
+
+        //dir 0-up, 1-right, 2-down, 3-left
+        function displace(cc, dir){
+            let y = cc[0];
+            let x = cc[1];
+
+            // anim.push([cc2[1],cc2[0],"gone"])
+
+            switch (dir){
+                case 0:
+                    while (y < field.length) {
+                        field[y - 1].splice(x, 1, field[y][x]);
+                        anim.push([x,y,"up"]);
+                        y++;
+                    }
+                    field[y-1][x] = draw();
+                    break;
+                case 1:
+                    field[y].splice(x+1,1);
+                    field[y].unshift(draw());
+                    while (x>=0){
+                        anim.push([x,y,"right"]);
+                        x--;
+                    }
+                    break;
+                case 2:
+                    while (y >= 0) {
+                        field[y+1].splice(x, 1, field[y][x]);
+                        anim.push([x,y,"down"]);
+                        y--;
+                    }
+                    field[y+1][x] = draw();
+                    break;
+                case 3:
+                    field[y].splice(x-1,1);
+                    field[y].push(draw());
+                    while (x< field[y].length){
+                        anim.push([x,y,"left"]);
+                        x++;
+                    }
+                    break;
+            }
+
+            restat();
+
+
+            animate();
+            setTimeout(function(){
+                play();
+            },1000);
+            //render();
+
+        }
+
+        function restat(){
+            if (hero.hp <= 0){
+                alert("You died!\nScore: "+hero.gold + "\nPlay Again?");
+                init();
+                return;
+            }
+
+            $(".s1").html(hero.hp + "/" + hero.maxhp);
+            $(".s2").html(hero.gold);
+            $(".s3").html(weapons[hero.weapon]);
+            $(".s4").html(hero.power);
+        }
+
+
+        function getMoves(c){
+            let cc = c.split('').map(Number);
+            let left = cc[0] + '' + next(cc[1],-1);
+            let right = cc[0]  + '' + next(cc[1],1);
+            let down = next(cc[0],1)  + '' + cc[1];
+            let up = next(cc[0],-1)  + '' + cc[1];
+
+            return [up,right,down,left];
+        }
+
+        function next(c,i){
+            let r = c+i;
+            return (r>=0 && r<=4) ? r : null;
+        }
+
+
+
+        /*function next(c,i){
+            let r = Number(c)+i;
+            if (r < 0){
+                r += 4;
+            } else if (r > 4){
+                r -= 4;
+            }
+            return r;
+        }*/
+
+        function place(){
+
+            for (let y= 0; y<4; y++){
+                for (let x= 0; x<4; x++){
+                    if (start == 0) {
+                        field[x][y] = hero;
+                    } else {
+                        let c = draw();
+                        field[x][y] = c;
+                    }
+                    start--;
+                }
+            }
+            render();
+            setTimeout(function(){
+                play();
+            },100);
+        }
+
+        function animate(){
+
+            if (anim.length > 0){
+                for (let i = 0; i< anim.length; i++){
+                    console.log(anim[i])
+                    $(".r"+anim[i][1]+""+anim[i][0]).addClass(anim[i][2]);
+                }
+
+                setTimeout(function(){
+                    $(".slot").removeClass("up down left right gone off");
+                    render();
+                },1000);
+            } else {
+                render();
+            }
+        }
+
+        function render(){
+            $(".slot").removeClass("hero "+ type.join(" ") );
+
+            for (let y= 0; y<4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    if (field[x][y].type  == "hero") {
+                        $(".r" + x + y).html("H");
+                        $(".r" + x + y).addClass("hero");
+                    } else {
+                        let c = field[x][y];
+                        $(".r" + x + y).html(c.name + "<br/>" + c.power);
+                        $(".r" + x + y).addClass(c.type);
+                    }
+                }
+            }
+        }
+
+
+        function draw(){
+            var c = deck.splice(0,1)[0];
+            discard.push(c);
+
+            if (deck.length == 0){
+                deck = discard;
+                climb();
+                shuffle(deck);
+            }
+
+            return c;
+        }
+
+        function climb(){
+            floor++;
+            for (let i=0; i< deck.length; i++){
+                if (deck[i].type=="monster")
+                    deck[i].power+=floor;
+            }
+        }
+
+        function gentest(){
+            let deck = [];
+
+            for (let t = 0; t < type.length; t++) {
+                for (let i = 2; i <= 6; i++) {
+                    let card = {
+                        name: icon[t],
+                        power: i,
+                        type:type[t],
+                    }
+
+                    console.log(card.type + " == poison " +  (card.type== "poison"))
+
+                    if (card.type == "poison")
+                        card.power = 0;
+
+                    if (card.type == "bomb")
+                        card.flag = 4,
+
+                            console.log(card);
+
+                    deck.push(card);
+                }
+            }
+
+            let b = {
+                name : "TEST",
+                power: 10,
+                type:"boss",
+                onTurn: function(){
+                    this.power+=1;
+                }
+            }
+
+            boss.push(b);
+
+            return deck;
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        //powerful tool indeed!
+        function listToMatrix(list, elementsPerSubArray) {
+            var matrix = [], i, k;
+
+            for (i = 0, k = -1; i < list.length; i++) {
+                if (i % elementsPerSubArray === 0) {
+                    k++;
+                    matrix[k] = [];
+                }
+
+                matrix[k].push(list[i]);
+            }
+
+            return matrix;
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        let test = [
+            [1,1,1,1],
+            [2,2,2,2],
+            [3,3,8,3],
+            [4,4,4,4],
+        ]
+
+        /*testDisplace([2,2],2);
+
+        //dir 0-up, 1-right, 2-down, 3-left
+        function testDisplace(target, dir){
+
+            let x = target[0];
+            let y = target[1];
+
+            switch (dir){
+                case 0:
+                    while (y < test.length) {
+                        test[y - 1].splice(x, 1, test[y][x]);
+                        y++;
+                    }
+                    test[y-1][x] = 0;
+                    break;
+                case 1:
+                    test[y].splice(x+1,1);
+                    test[y].unshift(0);
+                    break;
+                case 2:
+                    while (y >= 0) {
+                        test[y+1].splice(x, 1, test[y][x]);
+                        y--;
+                    }
+                    test[y+1][x] = 0;
+                    break;
+                case 3:
+                    test[y].splice(x-1,1);
+                    test[y].push(0);
+                    break;
+            }
+
+
+        }*/
+
+        function clone(obj) {
+            if (null == obj || "object" != typeof obj) return obj;
+            var copy = obj.constructor();
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+            }
+            return copy;
+        }
+
+    </script>
+
+    <style>
+        .main{
+            width:100%;
+            height:100%;
+        }
+
+        .stat{
+            position:relative;
+            width:80vw;
+            height:40px;
+            margin:auto;
+            margin-bottom:10px;
+            font-size:1rem;
+            display: grid;
+            grid-template-areas:
+                    'l1 s1 l2 s2'
+                    'l3 s3 l4 s4'
+        ;
+        }
+
+        .grid{
+            position:relative;
+            width:80vw;
+            height:80vw;
+            display: grid;
+            grid-template-areas:
+                    'r01 r11 r21 r31'
+                    'r02 r12 r22 r32'
+                    'r03 r13 r23 r33'
+                    'r04 r14 r24 r34'
+        ;
+            grid-gap:10px;
+            margin:auto;
+        }
+
+        @media screen and (orientation:landscape) {
+            .grid{
+                width:80vh;
+                height:80vh;
+            }
+            .stat{
+                width:80vh;
+            }
+        }
+
+        .slot{
+            background:white;
+            border:1px solid;
+            pointer-events:none;
+            font-size:0.8rem;
+            cursor: pointer;
+            transform: translate(0,0),
+        }
+
+        .slot.up{
+            animation: 1s up ;
+        }
+
+        .slot.down{
+            animation: 1s down ;
+        }
+
+        .slot.left{
+            animation: 1s left ;
+        }
+
+        .slot.right{
+            animation: 1s right ;
+        }
+
+        .slot.gone{
+            animation: 1s gone ;
+        }
+
+        @keyframes gone{
+            0%{
+                z-index:-1;
+            } 30%{
+                  transform: rotate(-20deg);
+              } 60%{
+                    transform: rotate(20deg);
+                } 100% {
+                      transform: rotate(0deg);
+                      opacity:0.2;
+                  }
+        }
+
+        @keyframes up{
+            0% {
+                transform: translateY(0);
+            } 100% {
+                  transform: translateY(-120%);
+              }
+        }
+        @keyframes down{
+            0% {
+                transform: translateY(0);
+            } 100% {
+                  transform: translateY(120%);
+              }
+        }
+        @keyframes left{
+            0% {
+                transform: translateX(0);
+            } 100% {
+                  transform: translateX(-120%);
+              }
+        }
+        @keyframes right{
+            0% {
+                transform: translateX(0);
+            } 100% {
+                  transform: translateX(120%);
+              }
+        }
+
+
+        .hero{
+            border-color:blue;
+        }
+        .glow{
+            border-color:gray;
+            pointer-events:auto;
+        }
+        .glow:hover{
+            border-color:blue;
+        }
+
+        .block{
+            display:block
+        }
+
+        .horz{
+            display:inline-block;
+        }
+
+        .trap.off{
+            color:lightgray;
+        }
+    </style>
+
+
+</head>
+<body>
+<div class="main">
+    <div class="stat">
+        <div class="l1">HP</div>
+        <div class="s1">8/8</div>
+        <div class="l2">Gold</div>
+        <div class="s2">0</div>
+        <div class="l3">Wpn.</div>
+        <div class="s3"></div>
+        <div class="l4">Power</div>
+        <div class="s4">0</div>
+    </div>
+    <div class="grid">
+        <div class="r00 slot" d="" c="00"></div>
+        <div class="r01 slot" d="" c="01"></div>
+        <div class="r02 slot" d="" c="02"></div>
+        <div class="r03 slot" d="" c="03"></div>
+        <div class="r10 slot" d="" c="10"></div>
+        <div class="r11 slot" d="" c="11"></div>
+        <div class="r12 slot" d="" c="12"></div>
+        <div class="r13 slot" d="" c="13"></div>
+        <div class="r20 slot" d="" c="20"></div>
+        <div class="r21 slot" d="" c="21"></div>
+        <div class="r22 slot" d="" c="22"></div>
+        <div class="r23 slot" d="" c="23"></div>
+        <div class="r30 slot" d="" c="30"></div>
+        <div class="r31 slot" d="" c="31"></div>
+        <div class="r32 slot" d="" c="32"></div>
+        <div class="r33 slot" d="" c="33"></div>
+    </div>
+</div>
+    <!--<div class="app">
+        <h1>HELLO PhoneGap</h1>
+        <div id="deviceready" class="blink">
+            <p class="event listening">Connecting to Device</p>
+            <p class="event received">Device is Ready</p>
+        </div>
+    </div>-->
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>
