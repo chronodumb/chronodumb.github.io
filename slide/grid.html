@@ -4,8 +4,8 @@
     <script src="js/jquery.min.js"></script>
 
     <script>
-        let icon=["⚔","🏹","♥","$","🐱","💀"]
-        let type=["sword","bow","potion","gold","monster","monster"] //todo: wands, spike, traps, relics, elite, boss
+        let icon=["⚔","🏹","♥","$","🐱","💀","!"] //"?","💩","💣"
+        let type=["sword","bow","potion","gold","monster","monster","trap"] //"chest","poison","bomb" //todo: wands, spike, traps, relics, elite, boss, chest
         let weapons = {
             "sword" : "⚔",
             "bow" : "🏹",
@@ -17,6 +17,7 @@
         let turn = 0;
         let start = 0;
         let anim = [];
+        let floor = 0;
         let direction = ["up","right","down","left"];
 
         let field = [
@@ -48,6 +49,7 @@
             start = roll(15);
             turn = 0;
             anim=[];
+            floor=0;
             hero = {
                 name:"H",
                 type:"hero",
@@ -64,21 +66,43 @@
         }
 
         function play(){
-
-            let c = $(".hero").attr("c");
-            let m = getMoves(c);
-
-            for (let i =0; i < m.length; i++){
-                if (m[i]) {
-                    $(".r" + m[i]).addClass("glow")
-                    $(".r" + m[i]).attr("d",i);
-                }
-            }
-
+            onturn();
             restat();
+
+            setTimeout(function(){
+                let c = $(".hero").attr("c");
+                let m = getMoves(c);
+
+                for (let i =0; i < m.length; i++){
+                    if (m[i]) {
+                        $(".r" + m[i]).addClass("glow")
+                        $(".r" + m[i]).attr("d",i);
+                    }
+                }
+            },100);
+
         }
 
-        let moving = false;
+        function onturn(){
+            for (let y= 0; y<4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    let c = field[y][x];
+                    if (c.type=="poison"){
+                        c.power++;
+                        render();
+                    }
+                    if (c.type=="trap" && (turn%2==0)){
+                        $(".r"+y+x).addClass("off");
+                    }
+                    if (c.type=="bomb"){
+                        c.flag = Number(c.flag)-1;
+                        $(".r"+y+x).append();
+                    }
+                }
+            }
+            turn++;
+        }
+
 
         //CC=YX
         function move(e){
@@ -92,6 +116,12 @@
 
             let target = field[cc2[0]][cc2[1]];
             console.log(target.type);
+
+            if (target.type == "chest"){
+                field[cc2[0]][cc2[1]] = draw();
+                target = field[cc2[0]][cc2[1]];
+                render();
+            }
 
             anim.push([cc2[1],cc2[0],"gone"]);
             anim.push([cc[1],cc[0],direction[d]]);
@@ -125,12 +155,16 @@
                             hero.power = target.power;
                         }
                         break;
+                    case "trap":
+                        if (!$(e).hasClass("off"))
+                            hero.hp -= target.power;
+                        break;
+                    case "chest":
 
                 }
 
                 displace(cc,d);
             },500)
-
 
         }
 
@@ -189,7 +223,7 @@
         }
 
         function restat(){
-            if (hero.hp < 0){
+            if (hero.hp <= 0){
                 alert("You died!\nScore: "+hero.gold + "\nPlay Again?");
                 init();
                 return;
@@ -257,7 +291,7 @@
                 }
 
                 setTimeout(function(){
-                    $(".slot").removeClass("up down left right gone");
+                    $(".slot").removeClass("up down left right gone off");
                     render();
                 },1000);
             } else {
@@ -275,7 +309,7 @@
                         $(".r" + x + y).addClass("hero");
                     } else {
                         let c = field[x][y];
-                        $(".r" + x + y).html(c.name);
+                        $(".r" + x + y).html(c.name + "<br/>" + c.power);
                         $(".r" + x + y).addClass(c.type);
                     }
                 }
@@ -289,10 +323,19 @@
 
             if (deck.length == 0){
                 deck = discard;
+                climb();
                 shuffle(deck);
             }
 
             return c;
+        }
+
+        function climb(){
+            floor++;
+            for (let i=0; i< deck.length; i++){
+                if (deck[i].type=="monster")
+                    deck[i].power+=floor;
+            }
         }
 
         function gentest(){
@@ -301,10 +344,21 @@
             for (let t = 0; t < type.length; t++) {
                 for (let i = 2; i <= 6; i++) {
                     let card = {
-                        name: icon[t] + "<br/>" + i,
+                        name: icon[t],
                         power: i,
                         type:type[t],
                     }
+
+                    console.log(card.type + " == poison " +  (card.type== "poison"))
+
+                    if (card.type == "poison")
+                        card.power = 0;
+
+                    if (card.type == "bomb")
+                        card.flag = 4,
+
+                    console.log(card);
+
                     deck.push(card);
                 }
             }
@@ -541,6 +595,10 @@
 
         .horz{
             display:inline-block;
+        }
+
+        .trap.off{
+            color:lightgray;
         }
     </style>
 
