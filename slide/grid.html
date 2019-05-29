@@ -21,7 +21,38 @@
         }
         let deck=[];
         let discard=[];
-        let boss=[];
+        let boss=[
+            {
+                type:"slime",
+                power:10,
+                desc:"heals every turn, cannot exceed 10",
+                skill:"heal",
+            },
+            {
+                type:"kobold",
+                power:9,
+                desc:"shoots the player anywhere in the map",
+                skill: "snipe",
+            },
+            {
+                type:"goblin",
+                power:11,
+                desc:"steal your gold",
+                skill: "steal",
+            },
+            {
+                type:"shaman",
+                power:8,
+                desc: "power up random enemy monster",
+                skill: "aura",
+            },
+            {
+                type:"necromancer",
+                power:8,
+                desc: "randomly summon skeletons",
+                skill: "undead",
+            },
+        ];
         let turn = 0;
         let start = 0;
         let anim = [];
@@ -39,12 +70,14 @@
             name:"H",
             type:"hero",
             power:0,
-            hp: 10,
-            maxhp: 10,
+            hp: 8,
+            maxhp: 8,
             weapon:"",
             poison:0,
             gold:0,
             items:[],
+            skill:"-",
+            boss:30,
         }
 
         /* TODO:
@@ -90,11 +123,15 @@
             hero = {
                 name:"H",
                 type:"hero",
-                power:0,
-                hp: 8,
-                maxhp: 8,
+                power:"-",
+                hp: 10,
+                maxhp: 10,
                 weapon:"",
+                poison:0,
                 gold:0,
+                items:[],
+                skill:"-",
+                boss:30,
             }
             deck = generate();
             shuffle(deck);
@@ -139,6 +176,15 @@
             //     hero.poison--;
             //     restat();
             // }
+
+            if (hero.skill > 0){
+                hero.skill--;
+                restat();
+            }
+            if (hero.boss > 0){
+                hero.boss--;
+                restat();
+            }
 
             for (let y= 0; y<4; y++) {
                 for (let x = 0; x < 4; x++) {
@@ -446,6 +492,11 @@
             $(".s2").html(hero.gold);
             $(".s3").html(weapons[hero.weapon]);
             $(".s4").html(hero.power);
+
+            $(".s5").html(hero.skill);
+            $(".s6").html(hero.boss);
+
+            console.log(hero);
         }
 
 
@@ -902,13 +953,13 @@
             <div class="l2">Gold</div>
             <div class="s2">0</div>
             <div class="l3">Wpn.</div>
-            <div class="s3"></div>
+            <div class="s3">-</div>
             <div class="l4">Power</div>
-            <div class="s4">0</div>
+            <div class="s4">-</div>
             <div class="l5">Skill</div>
-            <div class="s5">0/5</div>
+            <div class="s5">-</div>
             <div class="l6">Boss</div>
-            <div class="s6">0/20</div>
+            <div class="s6">-</div>
         </div>
         <div class="grid">
             <div class="r00 slot" d="" c="00"></div>
