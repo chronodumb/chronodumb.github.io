@@ -4,12 +4,20 @@
     <script src="js/jquery.min.js"></script>
 
     <script>
-        let icon=["⚔","🏹","♥","$","🐱","💀","!"] //"?","💩","💣"
-        let type=["sword","bow","potion","gold","monster","monster","trap"] //"chest","poison","bomb" //todo: wands, spike, traps, relics, elite, boss, chest
+        let icon=["⚔","🛡","♥","$","🐱","💀","!","?"] //"?","💩","💣"
+        let type=["sword","shield","potion","gold","monster","monster","trap","barrel"] //"barrel","poison","bomb" //todo: wands, spike, traps, relics, elite, boss, barrel
+
+        //special cards, only 1 of each in deck
+        let sicon = ["💩"]; //"X","💣"
+        let stype = ["poison"]; //"chest","bomb"
+
+
         let weapons = {
+            "":"",
             "sword" : "⚔",
             "bow" : "🏹",
-            "":"",
+            "wand":"✡",
+            "shield":"🛡",
         }
         let deck=[];
         let discard=[];
@@ -31,11 +39,40 @@
             name:"H",
             type:"hero",
             power:0,
-            hp: 8,
-            maxhp: 8,
+            hp: 10,
+            maxhp: 10,
             weapon:"",
+            poison:0,
             gold:0,
+            items:[],
         }
+
+        /* TODO:
+        Heroes
+
+        1. Knight - start with sword 4
+        2. Mage - start with wand 4
+        3. Archer - start with bow 4
+        4. Rogue - start with disarm
+        5.
+        6.
+        7. Hunter -
+        8.
+
+        Items
+
+        1. Disarm - prevent trap damage
+
+
+
+        Boss:
+
+        1. Something
+        2. Kobold -
+        3. Golem -
+
+        */
+
 
         $(document).ready(function(){
             init();
@@ -59,7 +96,7 @@
                 weapon:"",
                 gold:0,
             }
-            deck = gentest();
+            deck = generate();
             shuffle(deck);
 
             place();
@@ -83,24 +120,72 @@
 
         }
 
+        function turnGold(y,x){
+            field[y][x] = {
+                name : "$",
+                type : "gold",
+                power : 1,
+            }
+        }
+
         function onturn(){
+
+            // if (hero.poison > 0){
+            //     hero.hp--;
+            //     hero.poison--;
+            //     restat();
+            // }
+
             for (let y= 0; y<4; y++) {
                 for (let x = 0; x < 4; x++) {
                     let c = field[y][x];
+
+                    if (c.poison != null && c.poison > 0){
+                        if (c.type == "hero") {
+                            c.hp--;
+                        } else if (c.type == "monster"){
+                            c.power--;
+                            if (c.power == 0){
+                                turnGold(y,x);
+                            }
+                        }
+                        c.poison--;
+                        restat();
+                        render();
+                    }
+
                     if (c.type=="poison"){
                         c.power++;
+                        field[y][x] = c;
                         render();
                     }
                     if (c.type=="trap" && (turn%2==0)){
                         $(".r"+y+x).addClass("off");
                     }
                     if (c.type=="bomb"){
-                        c.flag = Number(c.flag)-1;
-                        $(".r"+y+x).append();
+                        c.power = Number(c.power)-1;
+                        render();
+
+                        if (c.power == 0){
+                            kaboom(y+""+x);
+                        }
                     }
                 }
             }
             turn++;
+        }
+
+        function swap(){
+
+        }
+
+        //deal 5 damage all around, mitigated by shields
+        function kaboom(c){
+            getMoves(c);
+            console.log(getMoves(c));
+            console.log("boom");
+
+
         }
 
 
@@ -117,54 +202,96 @@
             let target = field[cc2[0]][cc2[1]];
             console.log(target.type);
 
-            if (target.type == "chest"){
-                field[cc2[0]][cc2[1]] = draw();
-                target = field[cc2[0]][cc2[1]];
-                render();
-            }
+
 
             anim.push([cc2[1],cc2[0],"gone"]);
             anim.push([cc[1],cc[0],direction[d]]);
 
-            animate();
 
-            setTimeout(function(){
-                switch (target.type){
-                    case "monster":
+            let proceed = true;
+            switch (target.type){
+                case "monster":
+
+
+                    if (hero.weapon == "shield" || hero.weapon == "") {
+
                         hero.power -= target.power;
                         if (hero.power <= 0) {
                             hero.hp += hero.power;
                             hero.power = 0;
                             hero.weapon = "";
                         }
-                        break;
-                    case "gold":
-                        hero.gold += target.power;
-                        break;
-                    case "potion":
-                        hero.hp += target.power;
-                        if (hero.hp > hero.maxhp)
-                            hero.hp = hero.maxhp;
-                        break;
-                    case "sword":
-                    case "bow":
-                        if (hero.weapon == target.type){
-                            hero.power += target.power;
+
+                    } else {
+                        proceed = false;
+
+                        if (hero.power >= target.power){
+                            hero.power -= target.power;
+
+                            turnGold(cc2[0],cc2[1])
+
+                            if  (hero.power == 0){
+                                hero.weapon = "";
+                            }
                         } else {
-                            hero.weapon = target.type;
-                            hero.power = target.power;
+                            target.power-=hero.power;
+                            hero.power=0;
+                            hero.weapon = "";
+                            console.log("ahhhhh wala na dapat weapon!")
+                            console.log(hero);
                         }
-                        break;
-                    case "trap":
-                        if (!$(e).hasClass("off"))
+
+                    }
+
+
+                    break;
+                case "gold":
+                    hero.gold += target.power;
+                    break;
+                case "potion":
+                    hero.hp += target.power;
+                    if (hero.hp > hero.maxhp)
+                        hero.hp = hero.maxhp;
+                    break;
+                case "poison":
+                    hero.poison = target.power;
+                    break;
+                case "sword":
+                case "bow":
+                case "wand":
+                case "shield":
+                    if (hero.weapon == target.type){
+                        hero.power += target.power;
+                    } else {
+                        hero.weapon = target.type;
+                        hero.power = target.power;
+                    }
+                    break;
+                case "trap":
+                    if (!$(e).hasClass("off")){
+                        if (hero.items.indexOf("disarm"))
                             hero.hp -= target.power;
-                        break;
-                    case "chest":
+                    }
 
-                }
+                    break;
+                case "barrel":
+                    field[cc2[0]][cc2[1]] = draw();
+                    target = field[cc2[0]][cc2[1]];
+                    proceed = false;
+                    break;
+            }
 
-                displace(cc,d);
-            },500)
+            if (proceed) {
+                animate();
+                setTimeout(function(){
+                    displace(cc, d);
+                },500)
+            } else {
+                restat();
+                render();
+                play();
+            }
+
 
         }
 
@@ -230,6 +357,13 @@
             }
 
             $(".s1").html(hero.hp + "/" + hero.maxhp);
+
+            if (hero.poison > 0){
+                $(".s1").addClass("poisoned");
+            } else {
+                $(".s1").removeClass("poisoned");
+            }
+
             $(".s2").html(hero.gold);
             $(".s3").html(weapons[hero.weapon]);
             $(".s4").html(hero.power);
@@ -301,16 +435,23 @@
 
         function render(){
             $(".slot").removeClass("hero "+ type.join(" ") );
+            $(".slot").removeClass(stype.join(" ") );
+            $(".slot").removeClass("poisoned");
 
             for (let y= 0; y<4; y++) {
                 for (let x = 0; x < 4; x++) {
+                    let c = field[x][y];
+
                     if (field[x][y].type  == "hero") {
                         $(".r" + x + y).html("H");
                         $(".r" + x + y).addClass("hero");
                     } else {
-                        let c = field[x][y];
                         $(".r" + x + y).html(c.name + "<br/>" + c.power);
                         $(".r" + x + y).addClass(c.type);
+                    }
+
+                    if (c.poison > 0){
+                        $(".r" + x + y).addClass("poisoned");
                     }
                 }
             }
@@ -323,7 +464,7 @@
 
             if (deck.length == 0){
                 deck = discard;
-                climb();
+                //climb();
                 shuffle(deck);
             }
 
@@ -338,44 +479,58 @@
             }
         }
 
-        function gentest(){
+        function generate(){
             let deck = [];
 
             for (let t = 0; t < type.length; t++) {
-                for (let i = 2; i <= 6; i++) {
+                for (let i = 1; i < 7; i++) {
                     let card = {
                         name: icon[t],
                         power: i,
                         type:type[t],
                     }
 
-                    console.log(card.type + " == poison " +  (card.type== "poison"))
-
-                    if (card.type == "poison")
-                        card.power = 0;
-
-                    if (card.type == "bomb")
-                        card.flag = 4,
+                    if (card.type == "barrel"){
+                        card.power="";
+                    }
 
                     console.log(card);
+                    deck.push(card);
+                }
+            }
+
+            for (let s = 0; s < stype.length; s++) {
+                for (let i = 0; i < 1; i++) {
+                    let card = {
+                        name: sicon[s],
+                        power: 0,
+                        type: stype[s],
+                    }
+
+                    if (card.type == "bomb")
+                        card.power = 1;
 
                     deck.push(card);
                 }
             }
 
-            let b = {
-                name : "TEST",
-                power: 10,
-                type:"boss",
-                onTurn: function(){
-                    this.power+=1;
-                }
-            }
+            console.log(deck)
 
-            boss.push(b);
+
+            // let b = {
+            //     name : "TEST",
+            //     power: 10,
+            //     type:"boss",
+            //     onTurn: function(){
+            //         this.power+=1;
+            //     }
+            // }
+            //
+            // boss.push(b);
 
             return deck;
         }
+
 
         function shuffle(array) {
             for (var i = array.length - 1; i > 0; i--) {
@@ -600,6 +755,15 @@
         .trap.off{
             color:lightgray;
         }
+
+        .poisoned{
+            color:green;
+        }
+
+        .ticking{
+
+        }
+
     </style>
 
 
