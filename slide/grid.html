@@ -8,8 +8,8 @@
         let type=["sword","shield","potion","gold","monster","monster","trap","barrel"] //"barrel","poison","bomb" //todo: wands, spike, traps, relics, elite, boss, barrel
 
         //special cards, only 1 of each in deck
-        let sicon = ["💩"]; //"X","💣"
-        let stype = ["poison"]; //"chest","bomb"
+        let sicon = ["💩","💣"]; //"X","💣"
+        let stype = ["poison","bomb"]; //"chest","bomb"
 
 
         let weapons = {
@@ -103,7 +103,8 @@
         }
 
         function play(){
-            onturn();
+
+            let d = onturn();
             restat();
 
             setTimeout(function(){
@@ -116,16 +117,19 @@
                         $(".r" + m[i]).attr("d",i);
                     }
                 }
-            },100);
+            },d);
 
         }
 
-        function turnGold(y,x){
+        function turnGold(y,x,p){
+            p = p || 1;
             field[y][x] = {
                 name : "$",
                 type : "gold",
-                power : 1,
+                power : p,
             }
+
+            render();
         }
 
         function onturn(){
@@ -168,11 +172,15 @@
 
                         if (c.power == 0){
                             kaboom(y+""+x);
+
+                            d=1000;
                         }
                     }
                 }
             }
             turn++;
+
+            return 100;
         }
 
         function swap(){
@@ -181,11 +189,80 @@
 
         //deal 5 damage all around, mitigated by shields
         function kaboom(c){
-            getMoves(c);
-            console.log(getMoves(c));
             console.log("boom");
 
+            $(".r"+c).addClass("gone");
+            let cc = c.split("").map(Number);
+            empty(cc[0],cc[1]);
 
+            let m = getMoves(c);
+
+            for (let i= 0 ; i < m.length; i++){
+                if (m[i]!=null){
+                    let mc = m[i].split("").map(Number);
+
+                    console.log("hit " + m[i]);
+
+                    if (m[0] != null || m[1] != null)
+                        hit(mc[0],mc[1],5)
+
+                }
+            }
+
+
+        }
+
+        function hit(y,x,z){
+            let t = field[y][x].type;
+
+            if (t == "hero"){
+                $(".r"+y+""+x).addClass("hit");
+                if (hero.weapon == "shield"){
+                    hero.power -= z;
+                    if (hero.power <= 0){
+                        hero.weapon = "";
+                        hero.power = 0;
+                        hero.hp -= hero.power;
+                    }
+                } else {
+                    hero.hp -= z;
+                }
+            } else if (field[y][x].power != 0 && field[y][x].power != ""){
+                if (t == "boss") {
+                    //do some boss here
+                } else if (t == "bomb") {
+                    //chain bombing!
+                    if (field[y][x].power > 0){
+                        field[y][x].power = 0;
+                        kaboom(y+""+x);
+                    }
+
+                } else {
+                    field[y][x].power -= z;
+
+                    $(".r"+y+""+x).addClass("hit");
+                    if (field[y][x].power <= 0){
+                        turnGold(y,x);
+                    }
+                }
+
+            } else {
+                turnGold(y,x);
+            }
+
+            render();
+        }
+
+        function empty(y,x){
+            field[y][x] = {
+                name : "",
+                type : "empty",
+                power : "",
+            }
+
+            console.log("emptied!");
+
+            render();
         }
 
 
@@ -203,7 +280,6 @@
             console.log(target.type);
 
 
-
             anim.push([cc2[1],cc2[0],"gone"]);
             anim.push([cc[1],cc[0],direction[d]]);
 
@@ -212,6 +288,7 @@
             switch (target.type){
                 case "monster":
 
+                    $(".hero").addClass("ouch");
 
                     if (hero.weapon == "shield" || hero.weapon == "") {
 
@@ -224,6 +301,7 @@
 
                     } else {
                         proceed = false;
+                        $(".r"+cc2[1]+""+cc2[0]).addClass("hit");
 
                         if (hero.power >= target.power){
                             hero.power -= target.power;
@@ -237,7 +315,6 @@
                             target.power-=hero.power;
                             hero.power=0;
                             hero.weapon = "";
-                            console.log("ahhhhh wala na dapat weapon!")
                             console.log(hero);
                         }
 
@@ -269,12 +346,14 @@
                     break;
                 case "trap":
                     if (!$(e).hasClass("off")){
-                        if (hero.items.indexOf("disarm"))
-                            hero.hp -= target.power;
+                        //if (hero.items.indexOf("disarm"))
+                        hero.hp -= target.power;
+                        $(".hero").addClass("ouch");
                     }
 
                     break;
                 case "barrel":
+                    $(e).addClass("hit");
                     field[cc2[0]][cc2[1]] = draw();
                     target = field[cc2[0]][cc2[1]];
                     proceed = false;
@@ -377,12 +456,19 @@
             let down = next(cc[0],1)  + '' + cc[1];
             let up = next(cc[0],-1)  + '' + cc[1];
 
-            return [up,right,down,left];
+            let m =[up,right,down,left];
+            for (let i = 0; i < m.length; i++){
+                if (m[i].indexOf("null") >= 0){
+                    m[i] = null;
+                }
+            }
+
+            return m;
         }
 
         function next(c,i){
             let r = c+i;
-            return (r>=0 && r<=4) ? r : null;
+            return (r>=0 && r<4) ? r : null;
         }
 
 
@@ -425,7 +511,7 @@
                 }
 
                 setTimeout(function(){
-                    $(".slot").removeClass("up down left right gone off");
+                    $(".slot").removeClass("up down left right gone off hit ouch");
                     render();
                 },1000);
             } else {
@@ -500,7 +586,7 @@
             }
 
             for (let s = 0; s < stype.length; s++) {
-                for (let i = 0; i < 1; i++) {
+                for (let i = 0; i < 2; i++) {
                     let card = {
                         name: sicon[s],
                         power: 0,
@@ -508,7 +594,7 @@
                     }
 
                     if (card.type == "bomb")
-                        card.power = 1;
+                        card.power = 4;
 
                     deck.push(card);
                 }
@@ -625,14 +711,15 @@
         .stat{
             position:relative;
             width:80vw;
-            height:40px;
+            height:60px;
             margin:auto;
-            margin-bottom:10px;
+            margin-bottom:30px;
             font-size:1rem;
             display: grid;
             grid-template-areas:
                 'l1 s1 l2 s2'
                 'l3 s3 l4 s4'
+                'l5 s5 l6 s6'
             ;
         }
 
@@ -690,6 +777,29 @@
             animation: 1s gone ;
         }
 
+        .slot.hit{
+            animation: 1s hit;
+        }
+
+        @keyframes hit{
+            0%{
+                transform: rotate(0deg);
+                color:black;
+            } 30%{
+                transform: rotate(-20deg);
+                color:red;
+            } 60%{
+                transform: rotate(20deg);
+                color:black
+            } 90% {
+                transform: rotate(-20deg);
+                color:red
+            } 100%{
+                transform: rotate(0deg);
+                color:black;
+            }
+        }
+
         @keyframes gone{
             0%{
                 z-index:-1;
@@ -732,12 +842,15 @@
               }
         }
 
+        .ouch{
+            color:red;
+        }
 
         .hero{
             border-color:blue;
         }
         .glow{
-            border-color:gray;
+            border-color:cyan;
             pointer-events:auto;
         }
         .glow:hover{
@@ -752,16 +865,29 @@
             display:inline-block;
         }
 
+        .trap{
+            color:red;
+        }
         .trap.off{
-            color:lightgray;
+            color:gray;
         }
 
-        .poisoned{
+        .poison, .poisoned{
             color:green;
         }
 
-        .ticking{
+        .bomb{
+            animation: 1s ticking infinite;
+        }
 
+        @keyframes ticking{
+            0%{
+                color:black;
+            } 50% {
+                color:red;
+            } 100% {
+                color:black;
+            }
         }
 
     </style>
@@ -779,6 +905,10 @@
             <div class="s3"></div>
             <div class="l4">Power</div>
             <div class="s4">0</div>
+            <div class="l5">Skill</div>
+            <div class="s5">0/5</div>
+            <div class="l6">Boss</div>
+            <div class="s6">0/20</div>
         </div>
         <div class="grid">
             <div class="r00 slot" d="" c="00"></div>
@@ -797,6 +927,16 @@
             <div class="r31 slot" d="" c="31"></div>
             <div class="r32 slot" d="" c="32"></div>
             <div class="r33 slot" d="" c="33"></div>
+        </div>
+        <div class="items">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
     </div>
 </body>
