@@ -1,0 +1,263 @@
+<html>
+<head>
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+        const type = ["maki-5","maki-4","maki-3","nigiri-1","nigiri-2","nigiri-3","tempura","tempura","sashimi","sashimi","dumpling","dumpling","pudding","wasabi","chopsticks"];
+
+        start();
+
+        function start() {
+            _g = new Game();
+        }
+
+        function Game(){
+            console.log("new game starts");
+            this.players = [
+                new Player("p1",true),
+                new Player("a2",true),
+                new Player("a3",true),
+                new Player("a4",true),
+            ];
+            this.deck = genDeck();
+
+            let rno = 1;
+            new Round(this.deck,this.players,rno);
+        }
+
+        function Player(name,ai){
+            this.name = name;
+            this.ai = ai;
+            this.score = 0;
+            this.pudding = 0;
+            this.maki = 0;
+            this.cards = [];
+        }
+
+        function Round(deck,players,rno){
+
+            console.log("round " + rno);
+            console.log(players);
+
+
+
+            shuffle(deck);
+            console.log(deck.length);
+
+            let hands = drawSet(deck,players.length);
+            let tno = 1;
+
+            new Turn(deck,players,rno,tno,hands);
+
+        }
+
+        //every turn, all players will have to choose a card
+        function Turn(deck,players,rno,tno,hands){
+            console.log("turn " + tno);
+
+            //TODO:send cards to all connected players
+            for (let i = 0; i < players.length; i++){
+                console.log(players[i].name + " is looking at " + hands[i]);
+
+                //test, player will always take the first card
+                let c = draw(hands[i]);
+                console.log(players[i].name + " took " + c)
+                players[i].cards.push(c);
+            }
+
+            console.log("end turn, rotating! ");
+
+            rotate(hands);
+
+            if (hands[0].length > 0){
+                //next turn!
+                tno++;
+                setTimeout(function(){
+                    new Turn(deck,players,rno,tno,hands)
+                },100)
+            } else {
+                console.log("end round, begin scoring")
+                scoring(players);
+
+                if (rno == 3){
+                    endGame();
+                    return;
+                }
+
+                rno++;
+                setTimeout(function(){
+                    new Round(deck,players,rno)
+                },1000);
+            }
+        }
+
+        function endGame(){
+            console.log(_g);
+            console.log("end game");
+        }
+
+        function scoring(players){
+            //common scoring
+            for (let i = 0; i < players.length; i++){
+                let p = players[i];
+                let combo = {
+                    tempura:0,
+                    sashimi:0,
+                    dumpling:0,
+                    wasabi:0,
+                }
+
+                for (let x = 0; x < p.cards.length; x++){
+                    let c = p.cards[x];
+
+                    if (c == "pudding"){
+                        p.pudding++;
+                    } else if (c.indexOf("maki") == 0) {
+                        p.maki += c.split("-").map(Number)[1];
+                    } else {
+                        combo[c]++;
+
+                        if (c == "tempura" && combo.tempura % 2 == 1){
+                            p.score+= 5;
+                        } else if (c=="sashimi" && combo.tempura % 3 == 2){
+                            p.score+= 10;
+                        } else if (c=="dumpling" && combo.dumpling <= 5){
+                            p.score+= combo.dumpling;
+                        } else if (c.indexOf("nigiri") == 0){
+                            let n = c.split("-").map(Number)[1];
+                            if (combo.wasabi > 0){
+                                n = n * 3;
+                                combo.wasabi--;
+                            }
+                            p.score+= n;
+                        }
+                    }
+                }
+
+            }
+
+            //maki scoring
+            let makitop = [];
+            for (let i = 0; i < players.length; i++) {
+                let p = players[i];
+                if (p.maki > 0){
+                    if (makitop.length > 0 && makitop[0].maki < p.maki ){
+                        makitop.unshift(p);
+                    } else{
+                        makitop.push(p);
+                    }
+
+                }
+                //p.maki = 0;
+            }
+
+            if (makitop.length == 1){
+                makitop[0].score+=6;
+                console.log("maki king: " + makitop[0].name)
+
+            } else if (makitop.length > 1){
+                let tie = 0;
+                let i = 1;
+                while (i<makitop.length){
+                    if (makitop[0].maki == makitop[i].maki){
+                        tie++;
+                    }
+                    i++;
+                }
+
+                if (tie > 0){
+                    console.log("maki ties: ");
+                    i=0;
+                    while (i<tie){
+                        makitop[i].score += Math.floor(6/tie);
+                        console.log(makitop[i].name);
+                        i++;
+                    }
+                } else {
+                    makitop[0].score+=6;
+                    console.log("maki king: " + makitop[0].name)
+                    makitop[1].score+=6;
+                    console.log("maki queen: " + makitop[1].name)
+                }
+
+            }
+
+            //clearing cache
+            for (let i = 0; i < players.length; i++) {
+                let p = players[i];
+                p.maki=0;
+                p.cards=[];
+            }
+
+            console.log(players);
+
+        }
+
+
+
+        function genDeck(){
+            let deck = [];
+            for (let i = 0; i < type.length; i++){
+                if (type[i] == "wasabi" || type[i] == "chopsticks"){
+                    deck.push(type[i]);
+                    deck.push(type[i]);
+                } else {
+                    for (let j=0; j < 8; j++){
+                        deck.push(""+type[i]);
+                    }
+                }
+            }
+
+            return deck;
+        }
+
+        function shuffle(array) {
+            console.log("shuffle");
+
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+
+        }
+
+        function rotate(sets){
+            let a = sets.pop()
+            sets.unshift(a);
+
+            console.log(sets);
+        }
+
+        function draw(deck){
+            let c = deck.splice(0,1)[0];
+            return c;
+        }
+
+        function drawMore(deck,n){
+            let c = deck.splice(0,n);
+            return c;
+        }
+
+        function drawSet(deck,n){
+            n = n | 4;
+
+            let x = 12 - n;
+            let s = [];
+
+            for (let i=0; i<n; i++){
+                s.push(drawMore(deck,x));
+            }
+            return s;
+        }
+
+
+    </script>
+</head>
+<body>
+
+
+</body>
+
+</html>
