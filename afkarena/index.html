@@ -1,8 +1,185 @@
 <html>
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <title>AFKArena-Calculator</title>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/main.js"></script>
+        <style>
+            input[type=text]{
+                outline:none;
+                border:none;
+                width:3rem;
+                background:none;
+            }
+            table{
+                border-collapse:collapse;
+                margin:0.5rem;
+            }
+            th, td {
+                border:1px solid;
+                text-align: center;
+                width:5rem;
+                height:2rem;
+            }
+            .block {
+                display:block;
+            }
+            .stat table{
+                display:inline-block;
+            }
+
+            td:nth-child(2),td:nth-child(3){
+                background-color:lightyellow;
+            }
+
+            .total td{
+                background-color:lightgray;
+            }
+
+            .total {
+                display: none;
+            }
+
+            *{
+                font-size:0.95rem;
+            }
+            .sm{
+                font-size:0.7rem;
+            }
+
+            .time{ display: none }
+
+        </style>
     </head>
     <body>
-        --TEST TEST TEST---
+        <div>
+
+            <input type="button" onclick="add()" value="add hero"/>
+            <input type="button" onclick="calculate()" value="calculate"/>
+            <input class="val" type="button" onclick="showtime()" value="show time"/>
+            <input class="time" type="button" onclick="showtime()" value="show value"/>
+
+            <div class="block">
+            <table class="result">
+                <tr>
+                    <th>Hero</th>
+                    <th class="sm">Current<br/>Level</th>
+                    <th class="sm">Target<br/>Level</th>
+                    <th class="val">EXP</th>
+                    <th class="val">Gold</th>
+                    <th class="val sm">Essence</th>
+                    <th class="time">ExpTime</th>
+                    <th class="time">GoldTime</th>
+                    <th class="time sm">EssenceTime</th>
+                    <th></th>
+                </tr>
+                <tr class="hero" id="h1">
+                    <td>1</td>
+                    <td><input type="text" class="slvl" value=""/></td>
+                    <td><input type="text" class="elvl" value=""/></td>
+                    <td class="val"></td>
+                    <td class="val"></td>
+                    <td class="val"></td>
+                    <td class="time sm"></td>
+                    <td class="time sm"></td>
+                    <td class="time sm"></td>
+                    <td><input type="button" onclick="remove('h1')" value="x"/></td>
+                </tr>
+                <tr class="total">
+                    <td colspan="3">Total:</td>
+                    <td class="val"></td>
+                    <td class="val"></td>
+                    <td class="val"></td>
+                    <td class="time sm"></td>
+                    <td class="time sm"></td>
+                    <td class="time sm"></td>
+                    <td></td>
+                </tr>
+            </table>
+            </div>
+
+            <div class="stat block">
+                <table>
+                    <tr>
+                        <th colspan="2">Income per Min</th>
+                    </tr>
+                    <tr>
+                        <td>exp/min</td>
+                        <td><input type="text" id="iexp" value="770"/></td>
+                    </tr>
+                    <tr>
+                        <td>gold/min</td>
+                        <td><input type="text" id="igold" value="770"/></td>
+                    </tr>
+                    <tr>
+                        <td class="sm">essence/2hour*</td>
+                        <td><input type="text" id="iess" value="100"/></td>
+                    </tr>
+                </table>
+
+
+                <table>
+                    <tr>
+                        <th colspan="2">Current Owned</th>
+                    </tr>
+                    <tr>
+                        <td>exp</td>
+                        <td><input type="text" id="cexp"/></td>
+                    </tr>
+                    <tr>
+                        <td>gold</td>
+                        <td><input type="text" id="cgold"/></td>
+                    </tr>
+                    <tr>
+                        <td>essence</td>
+                        <td><input type="text" id="cess"/></td>
+                    </tr>
+                </table>
+
+                <table class="val">
+                    <tr>
+                        <th colspan="2">Total Needed</th>
+                    </tr>
+                    <tr>
+                        <td>exp</td>
+                        <td id="texp"/></td>
+                    </tr>
+                    <tr>
+                        <td>gold</td>
+                        <td id="tgold"/></td>
+                    </tr>
+                    <tr>
+                        <td>essence</td>
+                        <td id="tess"/></td>
+                    </tr>
+                </table>
+
+
+                <table class="time">
+                    <tr>
+                        <th colspan="2">Total Time Needed</th>
+                    </tr>
+                    <tr>
+                        <td>exp time</td>
+                        <td id="ttexp"/></td>
+                    </tr>
+                    <tr>
+                        <td>gold time</td>
+                        <td id="ttgold"/></td>
+                    </tr>
+                    <tr>
+                        <td class="sm">essence time</td>
+                        <td id="ttess"/></td>
+                    </tr>
+                </table>
+
+
+
+            </div>
+            <p>
+            *Approximately how may essence every 2 hours. Use fast collect then enter the amount of essence you get from it
+            </p>
+        </div>
+
     </body>
 </html>
