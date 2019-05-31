@@ -1,0 +1,43 @@
+<html>
+<head>
+    <script src="js/jquery.min.js"></script>
+    <script>
+
+        const stats = ["hp","str","int","fate","gold"];
+
+        let g = new game("test","knight");
+
+        //optional settings to be added later such as expansions and such
+        function game(player,hero,opt){
+            this.floor = 1;
+            this.turn = 0;
+            this.deck = testDeck();
+        }
+
+        console.log(g);
+
+        console.log(g.test);
+
+        //TODO;
+        function generateDeck(opt){
+            let deck = [];
+
+        }
+
+        //testdeck, no settings.
+        function testDeck(){
+            let deck = [];
+
+            for (let i = 1; i < 6; i++){
+
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+
+</body>
+
+</html>
