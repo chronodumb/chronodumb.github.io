@@ -21,12 +21,6 @@
                 width:5rem;
                 height:2rem;
             }
-            .block {
-                display:block;
-            }
-            .stat table{
-                display:inline-block;
-            }
 
             td:nth-child(2),td:nth-child(3){
                 background-color:lightyellow;
@@ -47,7 +41,16 @@
                 font-size:0.7rem;
             }
 
+            .block {
+                display:block;
+            }
+
+            .stat table{
+                display:inline-block;
+            }
+
             .time{ display: none }
+
 
         </style>
     </head>
@@ -75,8 +78,8 @@
                 </tr>
                 <tr class="hero" id="h1">
                     <td>1</td>
-                    <td><input type="text" class="slvl" value=""/></td>
-                    <td><input type="text" class="elvl" value=""/></td>
+                    <td><input type="text" class="slvl" value="100"/></td>
+                    <td><input type="text" class="elvl" value="160"/></td>
                     <td class="val"></td>
                     <td class="val"></td>
                     <td class="val"></td>
@@ -118,7 +121,7 @@
                 </table>
 
 
-                <table>
+                <!--<table>
                     <tr>
                         <th colspan="2">Current Owned</th>
                     </tr>
@@ -134,42 +137,42 @@
                         <td>essence</td>
                         <td><input type="text" id="cess"/></td>
                     </tr>
-                </table>
+                </table>-->
 
-                <table class="val">
+                <table class="val ctotal">
                     <tr>
                         <th colspan="2">Total Needed</th>
                     </tr>
                     <tr>
                         <td>exp</td>
-                        <td id="texp"/></td>
+                        <td class="exp"/></td>
                     </tr>
                     <tr>
                         <td>gold</td>
-                        <td id="tgold"/></td>
+                        <td class="gold"/></td>
                     </tr>
                     <tr>
                         <td>essence</td>
-                        <td id="tess"/></td>
+                        <td class="ess"/></td>
                     </tr>
                 </table>
 
 
-                <table class="time">
+                <table class="time ctotal" style="display:none">
                     <tr>
                         <th colspan="2">Total Time Needed</th>
                     </tr>
                     <tr>
                         <td>exp time</td>
-                        <td id="ttexp"/></td>
+                        <td class="sm timeexp"/></td>
                     </tr>
                     <tr>
                         <td>gold time</td>
-                        <td id="ttgold"/></td>
+                        <td class="sm timegold"/></td>
                     </tr>
                     <tr>
                         <td class="sm">essence time</td>
-                        <td id="ttess"/></td>
+                        <td class="sm timeess"/></td>
                     </tr>
                 </table>
 

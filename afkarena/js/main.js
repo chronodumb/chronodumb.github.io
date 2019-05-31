@@ -4,9 +4,7 @@ const essence=[0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0
 const sum = arr => arr.reduce((a,b) => a + b, 0)
 
 var h=1;
-var iexp=0;
-var igold=0;
-var iess=0;
+var iexp=0,igold=0,iess=0,cexp=0,cgold=0,cess=0;
 
 
 function add(){
@@ -43,6 +41,16 @@ function calculate(){
         exp : 0,
         gold : 0,
         ess : 0,
+
+        timeexp : 0,
+        timegold : 0,
+        timeess : 0,
+    }
+
+    let ctotal = {
+        exp : -cexp,
+        gold : -cgold,
+        ess : -cess,
 
         timeexp : 0,
         timegold : 0,
@@ -100,14 +108,23 @@ function calculate(){
 
     let x = 0;
     for (let t in total) {
+        ctotal[t] = ctotal[t]+total[t];
+
+        console.log("xxxx" + ctotal[t])
+
         if (x < 3){
             total[t] = total[t].pretty();
+            ctotal[t] = ctotal[t].pretty();
         } else {
             total[t] = formatTime(total[t]);
+            ctotal[t] = formatTime(ctotal[t]);
         }
+
 
         x++;
         $($(".total").children()[x]).html(total[t]);
+        $($(".ctotal ."+t)).html(total[t]);
+        // $($(".ctotal ."+t)).html(ctotal[t]);
     }
 
 
@@ -143,7 +160,7 @@ function formatTime(s){
     return ((day > 0)? day + "d " : "")   + ((hour > 0)? hour + "h " : "")  + ((min > 0)? min + "m " : "")  + ((sec > 0) ? sec + "s" : "");
 }
 
-function getIncome(){
+function getIncome() {
     iexp = $("#iexp").val() || 0;
     igold = $("#igold").val() || 0;
     iess = $("#iess").val() || 0;
@@ -151,5 +168,10 @@ function getIncome(){
     iexp = iexp / 60;
     igold = igold / 60;
     iess = iess / 120 / 60;
+}
 
+function getOwned(){
+    cexp = $("#cexp").val() || 0;
+    cgold = $("#cgold").val() || 0;
+    cess = $("#cess").val() || 0;
 }
