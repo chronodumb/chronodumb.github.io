@@ -91,8 +91,44 @@
             }
         }
 
+        //pudding rule applies here! also add option to new games
         function endGame(){
+
+            let puddingtop = _g.players.map(a => a.pudding);
+
+            puddingtop = [...new Set(puddingtop.sort().reverse())];
+
+            if (puddingtop.length == 1){
+                let tops = filter(_g.players, "pudding", puddingtop.shift());
+                let tie = tops.length;
+                for (let i = 0; i < tie; i++){
+                    _g.players[i].score += Math.floor(6/tie);
+                }
+
+            } else if (puddingtop.length > 1){
+                let tops = filter(_g.players, "pudding", puddingtop.shift());
+
+                let tie = tops.length;
+                for (let i = 0; i < tie; i++){
+                    _g.players[i].score += Math.floor(6/tie);
+                }
+
+
+                let bottoms = filter(_g.players, "pudding", puddingtop.pop());
+
+                tie = bottoms.length;
+                for (let i = 0; i < tie; i++){
+                    _g.players[i].score -= Math.floor(6/tie);
+                }
+            }
+
+            _g.players.sort(dynamicSort("-score"));
+
             console.log(_g);
+
+
+
+
             console.log("end game");
         }
 
@@ -250,6 +286,28 @@
                 s.push(drawMore(deck,x));
             }
             return s;
+        }
+
+        function dynamicSort(property) {
+            var sortOrder = 1;
+            if(property[0] === "-") {
+                sortOrder = -1;
+                property = property.substr(1);
+            }
+            return function (a,b) {
+                /* next line works with strings and numbers,
+                 * and you may want to customize it to your needs
+                 */
+                var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+                return result * sortOrder;
+            }
+        }
+
+        function filter(array,prop,val){
+            result = array.filter(obj => {
+                return obj[prop] == val
+            })
+            return result;
         }
 
 
