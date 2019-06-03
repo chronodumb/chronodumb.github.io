@@ -1,9 +1,10 @@
 <html>
 <head>
     <script src="js/jquery.min.js"></script>
-
     <script>
         const type = ["maki-5","maki-4","maki-3","nigiri-1","nigiri-2","nigiri-3","tempura","tempura","sashimi","sashimi","dumpling","dumpling","pudding","wasabi","chopsticks"];
+        const prioA = ["wasabi","nigiri-3","nigiri-2","nigiri-1","maki-5","maki-4","maki-3","tempura","sashimi","dumpling","pudding"];
+        const prioB = ["tempura","sashimi","dumpling","wasabi","nigiri-3","nigiri-2","nigiri-1","maki-5","maki-4","maki-3","pudding"];
 
         start();
 
@@ -14,10 +15,10 @@
         function Game(){
             console.log("new game starts");
             this.players = [
-                new Player("p1",true),
-                new Player("a2",true),
-                new Player("a3",true),
-                new Player("a4",true),
+                new Player("p1",1),
+                new Player("a2",2),
+                new Player("a3",3),
+                new Player("a4",4),
             ];
             this.deck = genDeck();
 
@@ -27,7 +28,7 @@
 
         function Player(name,ai){
             this.name = name;
-            this.ai = ai;
+            this.ai = ai; // 0 = player, 1= dumb, 2= less dumb, 3= hopefully not dumb anymore
             this.score = 0;
             this.pudding = 0;
             this.maki = 0;
@@ -59,10 +60,8 @@
             for (let i = 0; i < players.length; i++){
                 console.log(players[i].name + " is looking at " + hands[i]);
 
-                //test, player will always take the first card
-                let c = draw(hands[i]);
-                console.log(players[i].name + " took " + c)
-                players[i].cards.push(c);
+                if (players[i].ai)
+                    aimove(players[i],hands[i]);
             }
 
             console.log("end turn, rotating! ");
@@ -90,6 +89,20 @@
                 },1000);
             }
         }
+
+        //making the AI a little bit smarter
+        function aimove(player, hand){
+            if (player.ai == 1){ // just take the first
+                let c = draw(hand);
+                console.log(player.name + " took " + c)
+                player.cards.push(c);
+            } else {
+                let c = take(hand);
+                console.log(player.name + " took " + c)
+                player.cards.push(c);
+            }
+        }
+
 
         //pudding rule applies here! also add option to new games
         function endGame(){
@@ -218,6 +231,9 @@
 
             }
 
+            clog("scoring")
+            clog(players);
+
             //clearing cache
             for (let i = 0; i < players.length; i++) {
                 let p = players[i];
@@ -225,7 +241,6 @@
                 p.cards=[];
             }
 
-            console.log(players);
 
         }
 
@@ -264,6 +279,29 @@
             sets.unshift(a);
 
             console.log(sets);
+        }
+
+        function take(deck){
+            let c = deck.splice(Math.floor(Math.random()*deck.length),1)[0];
+            return c;
+        }
+
+        function takePrio(deck,prio) {
+            let res = deck.find(function (el) {
+                for (let px of prio) {
+                    console.log(px);
+                    if (el == px)
+                        return true;
+                }
+
+            })
+
+            if (res){
+                return res;
+            } else {
+                //if found nothing, just take random
+                return take(deck)
+            }
         }
 
         function draw(deck){
@@ -310,6 +348,9 @@
             return result;
         }
 
+        function clog(c){
+            console.log(JSON.parse(JSON.stringify(c)));
+        }
 
     </script>
 </head>
