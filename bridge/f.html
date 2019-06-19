@@ -7,14 +7,29 @@
         //turn test
 
         let heroes = {
+            knight : {
+                name : "Knight",
+                hp  : [7,7,8],
+                atk : [2,2,2],
+                type: "melee",
+                effects : ["shield","armor","defend"],
+                tag : ["sword","knight","empire"],
+            }
             paladin : {
                 name : "Paladin",
-                hp  : [10,11,12,13,14],
-                atk : [3,3,4,4,5],
+                hp  : [6,8,9],
+                atk : [2,3,3],
                 type: "melee",
-                effects : ["bash","shield","endure","morale_boost","immune"],
-                tag : ["mace","defender","empire"],
-
+                effects : ["parry","endure","holyblade"],
+                tag : ["mace","knight","empire"],
+            },
+            lancer: {
+                name : "Paladin",
+                hp  : [6,7,8],
+                atk : [2,3,4],
+                type: "melee",
+                effects : ["firsthit","pierce","charge"],
+                tag : ["spear","knight","empire"],
             }
         }
 
@@ -46,8 +61,7 @@
             },
             stun:{
                 event: "atk",
-                effect: "remove(self,'stun')",
-                tag:[""],
+                effect: "remove(self,'stun')"
             },
             immune:{
                 event:"def",
@@ -56,16 +70,24 @@
             }
         }
 
+        let identify = (e) => {
+            for (e of Object.entries(e)){
+                key = e[0];
+                val = e[1];
+                val.id = key;
+            }
+        }
 
-        const query = (obj, prop, val) => Object.keys(obj).filter(k => obj[k][prop].includes(val));
+        identify(effects)
 
-        let aura_skills = query(effects,"event","aura");
-        let def_skills = query(effects,"event","def");
-        let atk_skills = query(effects,"event","atk");
 
-        console.log(aura_skills)
-        console.log(def_skills)
-        console.log(atk_skills)
+        let query = (test_obj,prop,val) => (Object.values(test_obj).filter(o => o[prop] == val).map(o=>o.id));
+
+        let aura_skills = query(effects,"tag","aura");
+        let def_skills = query(effects,"tag","def");
+        let atk_skills = query(effects,"tag","atk");
+
+        console.log(auras)
 
 
         // ally 3,2,1 - enemy 1,2,3
@@ -153,8 +175,9 @@
 
         function enemy_turn(){
             if (field.enemy.length < 3)
-                field.enemy.unshift(draw(enemies));
-
+                field.enemy.push(draw(enemies));
+            else
+                return;
 
 
             console.log(field)
@@ -170,24 +193,16 @@
 
             if (n < 3) {
                 let h = draw(allies);
-                field.ally.unshift(h);
+                field.ally.shift(h);
                 //onEnter here
-            } else
-                return;
+
+            }
+
+            aura_check();
 
 
             //perform attack 3,2,1 go!
             for (let i = n; i >= 0; i--){
-                let h = field.ally[i];
-
-                for (f of h.effects){
-                    let s = effects[f];
-                    if (s.event == "atk"){
-
-                        console.log("ally " + h.name + "" + h.rare + " use " + f )
-                        //perform skill
-                    }
-                }
 
             }
 
