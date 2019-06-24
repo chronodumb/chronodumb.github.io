@@ -1,0 +1,340 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        //8x6 array ?
+        let field={
+            e:[[],[],[],[],[],[],[],[]],
+            p:[[],[],[],[],[],[],[],[]],
+        };
+
+        const units = {
+            A : {
+                pow:3,
+                def:1,
+                wait:0,
+            },
+            B : {
+                pow:2,
+                def:2,
+                wait:1,
+            },
+            C : {
+                pow:3,
+                def:1,
+                wait:1,
+            },
+            D : {
+                pow:4,
+                def:2,
+                wait:2,
+            },
+        }
+
+        let p = {
+            HP: 10,
+            MaxHP:10,
+            units: ["A","B","C","D"],
+            army:16,
+            moves:3,
+            skill: null,
+            artifacts:null,
+            field:"p",
+        }
+
+        let e = {
+            HP: 10,
+            MaxHP:10,
+            units: ["A","B","C","D"],
+            army:16,
+            moves:3,
+            skill: null,
+            artifacts:null,
+            field:"e",
+        }
+
+
+        function call(h){
+            if (h.army > 0 && h.moves > 0){
+                h.moves--;
+
+                let f = field[h.field];
+
+                while (h.army>0){
+                    if (isFull(f))
+                        break;
+
+                    let u = h.units[roll(h.units.length)];
+                    let x = roll(8);
+                    if (f[x].length < 6){
+                        let y = f[x].length;
+
+                        let cc = h.field + "" + x + "" + y;
+                        console.log(cc);
+                        animate.enter(cc,u,h.field);
+
+                        f[x].push(u);
+                        h.army--;
+                    }
+                }
+
+                setTimeout(function(){
+                    match(h.field);
+                },1000)
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        function isFull(f){
+            for (let x = 0; x < f.length; x++){
+                if (f[x].length<6)
+                    return false;
+            }
+
+            return true;
+        }
+
+        function match(h){
+
+            console.log("matching")
+
+            let f = field[h];
+
+            //vertical-3
+            for(let x = 0; x < f.length; x++){
+                let combo = null;
+                let chain = [];
+                for (let y=0; y< f[x].length; y++){
+
+                    console.log("checking " + h.concat(x,y));
+                    if (f[x][y] != undefined && (combo == f[x][y] || combo == null)){
+                        combo = f[x][y]
+                        chain.push(h.concat(x,y));
+                    } else {
+                        combo = f[x][y]
+                        chain = [];
+                        chain.push(h.concat(x,y));
+                    }
+                    console.log("combo " + combo)
+
+                    console.log("chain " + chain.length);
+                    if (chain.length == 3){
+                        cc = chain[0].split("")
+                        console.log("charged " + chain[0]);
+                        f[cc[1]][cc[2]]+="2";
+
+                        animate.charge(cc,u,h.field);
+                    }
+
+                }
+            }
+
+
+        }
+
+        const animate = {
+            enter : function(cc,u,p){
+                console.log(cc + "-->" + u)
+                $("."+cc).append("<div class='unit enter " + p + "'>" + u + "</div>");
+            },
+        }
+
+        $(document).ready(function(){
+            test();
+        })
+
+        function test(){
+            call(p);
+            call(e);
+            console.log(field);
+            console.log(p);
+        }
+
+
+    </script>
+
+    <style>
+        .grid{
+            display: grid;
+            width:200px;
+            grid-template:
+                'e05 e15 e25 e35 e45 e55 e65 e75'
+                'e04 e14 e24 e34 e44 e54 e64 e74'
+                'e03 e13 e23 e33 e43 e53 e63 e73'
+                'e02 e12 e22 e32 e42 e52 e62 e72'
+                'e01 e11 e21 e31 e41 e51 e61 e71'
+                'e00 e10 e20 e30 e40 e50 e60 e70'
+                'gap gap gap gap gap gap gap gap'
+                'p00 p10 p20 p30 p40 p50 p60 p70'
+                'p01 p11 p21 p31 p41 p51 p61 p71'
+                'p02 p12 p22 p32 p42 p52 p62 p72'
+                'p03 p13 p23 p33 p43 p53 p63 p73'
+                'p04 p14 p24 p34 p44 p54 p64 p74'
+                'p05 p15 p25 p35 p45 p55 p65 p75'
+            ;
+            grid-gap:5px;
+            margin:auto;
+        }
+
+        .grid div{
+            text-align:center;
+            height:20px;
+            width:20px;
+        }
+
+        .gap {
+            grid-area: gap;
+            height:10px !important;
+        }
+
+        .unit.enter.p{
+            animation: 1s enter_up ;
+        }
+        .unit.enter.e{
+            animation: 1s enter_down ;
+        }
+
+        @keyframes enter_up{
+            0% {
+                transform: translateY(800%);
+            } 100% {
+                transform: translateY(0%);
+            }
+        }
+
+        @keyframes enter_down{
+            0% {
+                transform: translateY(-800%);
+            } 100% {
+                  transform: translateY(0%);
+              }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="grid">
+
+        <div class="e05"></div>
+        <div class="e15"></div>
+        <div class="e25"></div>
+        <div class="e35"></div>
+        <div class="e45"></div>
+        <div class="e55"></div>
+        <div class="e65"></div>
+        <div class="e75"></div>
+
+        <div class="e04"></div>
+        <div class="e14"></div>
+        <div class="e24"></div>
+        <div class="e34"></div>
+        <div class="e44"></div>
+        <div class="e54"></div>
+        <div class="e64"></div>
+        <div class="e74"></div>
+
+        <div class="e03"></div>
+        <div class="e13"></div>
+        <div class="e23"></div>
+        <div class="e33"></div>
+        <div class="e43"></div>
+        <div class="e53"></div>
+        <div class="e63"></div>
+        <div class="e73"></div>
+
+        <div class="e02"></div>
+        <div class="e12"></div>
+        <div class="e22"></div>
+        <div class="e32"></div>
+        <div class="e42"></div>
+        <div class="e52"></div>
+        <div class="e62"></div>
+        <div class="e72"></div>
+
+        <div class="e01"></div>
+        <div class="e11"></div>
+        <div class="e21"></div>
+        <div class="e31"></div>
+        <div class="e41"></div>
+        <div class="e51"></div>
+        <div class="e61"></div>
+        <div class="e71"></div>
+
+        <div class="e00"></div>
+        <div class="e10"></div>
+        <div class="e20"></div>
+        <div class="e30"></div>
+        <div class="e40"></div>
+        <div class="e50"></div>
+        <div class="e60"></div>
+        <div class="e70"></div>
+
+
+
+        <div class="gap">&nbsp;</div>
+
+
+        <div class="p00"></div>
+        <div class="p10"></div>
+        <div class="p20"></div>
+        <div class="p30"></div>
+        <div class="p40"></div>
+        <div class="p50"></div>
+        <div class="p60"></div>
+        <div class="p70"></div>
+
+        <div class="p01"></div>
+        <div class="p11"></div>
+        <div class="p21"></div>
+        <div class="p31"></div>
+        <div class="p41"></div>
+        <div class="p51"></div>
+        <div class="p61"></div>
+        <div class="p71"></div>
+
+        <div class="p02"></div>
+        <div class="p12"></div>
+        <div class="p22"></div>
+        <div class="p32"></div>
+        <div class="p42"></div>
+        <div class="p52"></div>
+        <div class="p62"></div>
+        <div class="p72"></div>
+
+        <div class="p03"></div>
+        <div class="p13"></div>
+        <div class="p23"></div>
+        <div class="p33"></div>
+        <div class="p43"></div>
+        <div class="p53"></div>
+        <div class="p63"></div>
+        <div class="p73"></div>
+
+        <div class="p04"></div>
+        <div class="p14"></div>
+        <div class="p24"></div>
+        <div class="p34"></div>
+        <div class="p44"></div>
+        <div class="p54"></div>
+        <div class="p64"></div>
+        <div class="p74"></div>
+
+        <div class="p05"></div>
+        <div class="p15"></div>
+        <div class="p25"></div>
+        <div class="p35"></div>
+        <div class="p45"></div>
+        <div class="p55"></div>
+        <div class="p65"></div>
+        <div class="p75"></div>
+
+    </div>
+
+
+
+</body>
+</html>
