@@ -1,0 +1,70 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        const rare = ["common","rare","epic","legendary","mythical","immortal"]
+        const rate = [64,32,4];
+
+        const star_rate = {
+            "common" : [10,20,30],
+            "rare" : [50,60,70],
+            "epic" : [100,110,120],
+            "legendary" : [150,160,170],
+            "mythical" : [200,210,220],
+            "immortal" : [250,275,300],
+        }
+
+        const level_rate = [].concat.apply([],Object.values(star_rate));
+
+        console.log(level_rate);
+
+        function summon(){
+            let rating = roll(100);
+            let r = 0;
+            while (rating >= 0){
+                rating -= rate[r]
+                r++;
+            }
+
+            return r;
+        }
+
+        function summonX(n){
+            let i = 0;
+            let rates = [0,0,0];
+
+            while ( i < n) {
+                let r = summon()-1;
+                rates[r]++;
+                i++;
+            }
+
+            console.log(rates);
+        }
+
+        summonX(1000);
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        // class Unit(){
+        //     hp=0;
+        //     maxhp=0;
+        //     pow=0;
+        //     spd=0;
+        //     rare="";
+        //     star=0;
+        //     level=0;
+        //     skills=[];
+        //     buffs=[];
+        //     debuffs=[];
+        // }
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<html>
+<head>
+
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+        const units = {
+            knight : {
+                name: "Knight",
+                hp:5,
+                pow:3,
+                effects: ["bash","parry","armor"],
+                rare:"common",
+            },
+        }
+
+        const effects = {
+            bash: {
+                name: "Bash",
+                onAttack: "apply(target,'stun'); remove(self,'bash')",
+                tag: ["melee","physical","onAttack"],
+            },
+            stun: {
+                name: "Stun",
+                beforeAttack: "",
+                afterAttack: "remove('self','stun')",
+                tag: ["melee","physical"],
+            }
+        }
+
+        class Unit{
+            constructor(name,star,align){
+                let u = units[name];
+                this.name = u.name;
+                this.hp = u.hp;
+                this.maxhp = u.hp;
+                this.pow = u.pow;
+                this.effects = u.effects;
+                this.align = align;
+            }
+        }
+
+        let field = {
+            ally: [],
+            enemy: [],
+        }
+
+        const query = (obj, prop, val) => Object.keys(obj).filter(k => obj[k][prop].includes(val));
+        const has_effect = (obj, prop) => Object.values(obj).filter(o => o[prop]!== undefined);
+        const has_event = (keys, prop) => keys.filter(k => effects[k]!== undefined);
+
+        function attack(self,target){
+            //beforeAttack
+
+            //onAttack
+
+            let keys = has_event(self.effects,"onAttack");
+            console.log(keys);
+
+            for (let k of keys){
+                eval(effects[k].onAttack);
+            }
+
+            //afterAttack
+
+
+
+            console.log(field);
+        }
+
+        function remove(h, f){
+            let i = h.effects.indexOf(f);
+            if (i > -1) {
+                h.effects.splice(i, 1);
+            }
+        }
+
+        function apply(h,f){
+            h.effects.push(f);
+        }
+
+
+
+        test();
+
+        function test(){
+            let a = new Unit("knight",10,"ally");
+            let e = new Unit("knight",10,"enemy");
+
+
+            field.ally.push(a);
+            field.enemy.push(e);
+
+            attack(a, e);
+
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
