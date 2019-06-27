@@ -4,7 +4,10 @@
     <script src="js/jquery.min.js"></script>
 
     <script>
-        //spheres
+        //stars!
+        //you can combine 5 unwanted heroes into a star
+
+
 
         const rare = ["common","rare","epic","legendary","mythical","immortal"]
         const rate = [64,32,4];
@@ -57,23 +60,25 @@
                 name: "Knight",
                 hp:100,
                 pow:25,
-                skills: ["bash","shield","armor"],  //offense,defense,support
+                skills: ["bash","shield","armor"],
                 rare:"common",
             },
         }
 
-        const skills = {
-            bash_0: {
-                name: "Bash",
-                effect: "",
-                tag: ["melee","physical"]
-            },
+        const effects = {
             bash: {
                 name: "Bash",
-                effect: "damage = damage * (1+a[0].star_rate); e[0].apply('stun'); a[0].skills[0]='bash_0';",
-                tag: ["melee","physical"],
+                effect: "damage = damage * (1+a[0].star_rate); e[0].apply('stun'); a[0].skills[0]='';",
+                tag: ["melee","physical","attack"],
+            },
+            bash2: {
+                name: "Bash2",
+                effect: "damage = damage * (1+a[0].star_rate); e[0].apply('stun'); a[0].skills[0]='';",
+                tag: ["melee","physical","attack"],
             }
         }
+
+        const hastag = (effect, tag) => effect.filter(k => effects[k].tag.includes(tag));
 
         class Unit{
             constructor(name,star,align){
@@ -82,9 +87,7 @@
                 this.hp = u.hp;
                 this.maxhp = u.hp;
                 this.pow = u.pow;
-                this.skills = u.skills;
-                this.buffs = [];
-                this.debuffs = [];
+                this.effects = u.effects;
                 this.align = align;
             }
             attack(ally, enemy){
@@ -93,6 +96,8 @@
                 console.log(this.align + " " +  this.name + " use " + a);
 
                 let d = enemy[0].defend(enemy,ally);
+
+                console.log(field);
 
             }
             defend(ally, enemy){
@@ -109,7 +114,9 @@
         }
 
 
-        test();
+        console.log(hastag(["bash","bash2"],"attack"));
+
+        // test();
 
         function test(){
             let a = new Unit("knight",10,"ally");
@@ -119,7 +126,6 @@
             field.enemy.push(e);
 
             field.ally[0].attack(field.ally, field.enemy);
-
         }
 
 

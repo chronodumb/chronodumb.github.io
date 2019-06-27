@@ -1,0 +1,5 @@
+flow
+
+turn 1
+
+attacker loop effect list, apply all

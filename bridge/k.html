@@ -1,0 +1,254 @@
+<html>
+<head>
+
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+
+        const abilities={
+            bash:{
+                effect: "damage*=1.2; apply(defender,'stun'); attacker.ability[0] = null",
+                tag: "melee consume",
+            },
+            parry:{
+                effect: "if(attacker.type == 'melee'){ damage = 0; action='fail';}",
+            },
+            shieldbearer: {
+                effect:"apply(self,'shield') self.ability[0]=null;",
+            },
+            immunity:{
+                effect: "apply(self,'immune')",
+            }
+        }
+
+        const effects={
+            stun:{
+                type: "debuff",
+                duration:1,
+            },
+            immune:{
+                cancel:['poison'],
+                type: "buff",
+                duration:null,
+            }
+        }
+
+        class TestUnit {
+            constructor(name){
+                this.name= name;
+
+                let stat = 6;
+                this.pow = 2 + roll(stat);
+                this.hp= 10 + (stat-this.pow);
+                this.weapon = "sword";
+                this.type = "melee";
+                this.ability=["bash",null,null]; // offensive, defensive, passive
+                this.effects={
+                    "stun":0,
+                };
+            }
+        }
+
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function contains(target, pattern){
+            var value = 0;
+            if (target.length > 0){
+                pattern.forEach(function(word){
+                    value = value + target.includes(word);
+                });
+            }
+            return (value > 1)
+        }
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+
+        let game = {
+            ally:{
+                name: "player",
+                deck: [],
+                field: [],
+            },
+            enemy:{
+                name: "enemy",
+                deck: [],
+                field: [],
+            },
+            turn: 0,
+            over: false,
+        }
+
+        $(document).ready(function(){
+            test();
+        });
+
+        let record = null;
+
+        function test(){
+            //generate 12 random units for each deck
+            for (let i = 1; i <= 12; i++){
+                game.ally.deck.push(new TestUnit("Ally"+i));
+                game.enemy.deck.push(new TestUnit("Enemy"+i));
+            }
+
+            shuffle(game.ally.deck);
+            shuffle(game.enemy.deck);
+
+            record = clog(game);
+            turn();
+        }
+
+        function replay(){
+            game = clog(record);
+            while (!game.over){
+                turn();
+            }
+        }
+
+        function turn(){
+            if (game.turn % 2 == 0){
+                play("enemy","ally");
+            } else {
+                play("ally","enemy");
+            }
+
+
+            clog(game);
+
+            if (game.over){
+                console.log("game over")
+                return;
+            }
+
+
+            game.turn++;
+
+            turn();
+        }
+
+        function play(atk,def){
+            ally = game[atk];
+            enemy = game[def];
+
+            if (ally.field.length < 3){
+                if (ally.deck.length > 0)
+                ally.field.push(draw(ally.deck));
+            }
+
+            if (enemy.field.length > 0) {
+
+
+                 //
+                let attacker = ally.field[0];
+                let defender = enemy.field[0];
+
+                let action = "proceed";
+
+
+                console.log(Object.keys(attacker.effects))
+                if (attacker.effects["stun"]){
+                    clog(attacker.name + " is unable to move ");
+                    attacker.effects["stun"]--;
+                    return;
+                }
+
+                clog(attacker.name + " attacks ");
+
+
+                let a = attacker.ability[0];
+                let d = defender.ability[1];
+                let askill = abilities[a];
+                let dskill = abilities[d];
+
+                damage = attacker.pow;
+
+                if (d) {
+                    clog(defender.name + " use " + d);
+                    eval(dskill.effect);
+                }
+
+                if (action == "fail"){
+                    clog(attacker.name + "'s " + a + " failed");
+                    if (askill.tag.includes('consume')){
+                        attacker.ability[0] = null; //consumed;
+                    }
+                    return;
+
+                } else if (action == "prevent"){
+                    clog(defender.name + "'s " + d + " prevented it");
+                    return;
+
+                } else if (askill){
+                    clog(attacker.name + " use " + a);
+                    eval(askill.effect);
+                }
+
+
+                clog(defender.name + " was hit");
+
+                damage = Math.round(damage);
+                defender.hp -= damage;
+                clog(defender.name + " suffers " + damage + " damage");
+
+
+                if (defender.hp < 0) {
+                    clog(defender.name + " died");
+                    enemy.field.shift();
+                }
+
+            }
+
+            if (enemy.deck.length == 0){
+                game.over = true;
+                if (atk == "ally"){
+                    console.log("You Win!");
+                } else {
+                    console.log("You Lose")
+                }
+            }
+        }
+
+
+        const has_prop = (obj, cons, prop, val) => Object.keys(obj).filter(k => (cons[k][prop] && cons[k][prop].includes(val)));
+
+        function apply(target,status,value=1){
+            let canceler = has_prop(target.effects ,effects,"cancel",status);
+            if (canceler.length > 0){
+                delete target.effects[canceler[0]];
+                clog(status + " did not affect because target " + canceler[0]);
+            }
+
+            target.effects[status] += value;
+            clog(target.name + " is affected with " + status);
+
+        }
+
+    </script>
+</head>
+<body>
+    <input type="button" value="next" onclick="turn()"/>
+
+</body>
+</html>
