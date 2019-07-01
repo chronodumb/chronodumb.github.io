@@ -122,9 +122,9 @@
 
                     console.log("chain " + chain.length);
                     if (chain.length == 3){
-                        cc = chain[0].split("")
+                        let cc = chain[0].split("")
                         console.log("charged " + chain[0]);
-                        f[cc[1]][cc[2]]+="2";
+                        let u = f[cc[1]][cc[2]];
 
                         animate.charge(cc,u,h.field);
                     }
@@ -140,6 +140,10 @@
                 console.log(cc + "-->" + u)
                 $("."+cc).append("<div class='unit enter " + p + "'>" + u + "</div>");
             },
+            charge : function(cc,u,p){
+                console.log(cc + "-->charging")
+                $("."+cc).addClass("charging");
+            }
         }
 
         $(document).ready(function(){
@@ -213,7 +217,9 @@
               }
         }
 
-
+        .charging {
+            color:green;
+        }
     </style>
 </head>
 <body>

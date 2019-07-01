@@ -1,0 +1,84 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        //8x6 array ?
+        let field={
+            e:[[],[],[],[],[],[],[],[]],
+            p:[[],[],[],[],[],[],[],[]],
+        };
+
+        //horz
+
+        class Game {
+            constructor() {
+                this.player = {
+                    field: [[], [], [], [], [], [], [], []],
+                };
+                this.enemy = {
+                    field: [[], [], [], [], [], [], [], []],
+                }
+            }
+        }
+
+
+        let _g = new Game();
+
+        $(document).ready(function(){
+            test();
+        });
+
+        function test(){
+
+            console.log("ready");
+            _g.player.field[0].push("A");
+            _g.player.field[0].push("A");
+            _g.player.field[0].push("A");
+            _g.player.field[1].push("A");
+            _g.player.field[1].push("A");
+            _g.player.field[1].push("A");
+
+            match(_g.player.field);
+
+            clog(_g.player.field);
+        }
+
+        //in order of priority
+        function match(f){
+
+
+            for (let x=0; x < f.length; x++){
+                for (let y=0; y < f[x].length; y++){
+
+                    console.log("checking " + x + ""+ y + " " + f[0] )
+
+                    if(x < f.length-1 && y < f[x].length-1){
+                        if ( f[x][y] == f[x+1][y] && f[x][y] == f[x][y+1] && f[x][y] == f[x+1][y+1] ){ //square-match [a0,a1,b0,b1]
+                            console.log("charge big");
+                        }
+                    }
+
+                    if (f[x][y] == f[x][y+1] && f[x][y] == f[x][y+2]){
+                        console.log("charge small");
+                    }
+                }
+
+            }
+
+
+        }
+
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+    </script>
+
+</head>
+<body>
+
+
+</body>
+</html>
