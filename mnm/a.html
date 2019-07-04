@@ -2,20 +2,18 @@
 <head>
     <script src="../js/jquery.min.js"></script>
     <script>
-        //8x6 array ?
-        let field={
-            e:[[],[],[],[],[],[],[],[]],
-            p:[[],[],[],[],[],[],[],[]],
-        };
 
-        //horz
+        //LANDSCAPE!!
 
         class Game {
             constructor() {
-                this.player = {
+                this.setting = {
+                    speed : 1,
+                };
+                this.p = {
                     field: [[], [], [], [], [], [], [], []],
                 };
-                this.enemy = {
+                this.e = {
                     field: [[], [], [], [], [], [], [], []],
                 }
             }
@@ -28,45 +26,184 @@
             test();
         });
 
+        const units = {
+            A: {
+                type: "A",
+                pow: 3,
+                hold: 0,
+                growth: 1,
+                merge: 1,
+                sync: 1,
+            },
+            B: {
+                type: "B",
+                pow: 3,
+                hold: 0,
+                growth: 1,
+                merge: 1,
+                sync: 1,
+            }
+        }
+
+        class Unit{
+            constructor(u){
+                u = units[u];
+                this.status = "idle";
+                this.type = u.type;
+                this.pow = u.pow;
+                this.hold = u.hold;
+                this.growth = u.growth;
+                this.merge = u.merge;
+                this.sync = u.sync;
+                this.target = null;
+            }
+        }
+
         function test(){
 
             console.log("ready");
-            _g.player.field[0].push("A");
-            _g.player.field[0].push("A");
-            _g.player.field[0].push("A");
-            _g.player.field[1].push("A");
-            _g.player.field[1].push("A");
-            _g.player.field[1].push("A");
 
-            match(_g.player.field);
 
-            clog(_g.player.field);
+            drop("p",0,new Unit("A"));
+            drop("p",0,new Unit("A"));
+            drop("p",0,new Unit("A"));
+
+            match(_g.p.field);
+
         }
 
-        //in order of priority
+        //in order of priority... big->small->wall
         function match(f){
-
+            console.log(f);
 
             for (let x=0; x < f.length; x++){
                 for (let y=0; y < f[x].length; y++){
 
-                    console.log("checking " + x + ""+ y + " " + f[0] )
 
-                    if(x < f.length-1 && y < f[x].length-1){
-                        if ( f[x][y] == f[x+1][y] && f[x][y] == f[x][y+1] && f[x][y] == f[x+1][y+1] ){ //square-match [a0,a1,b0,b1]
-                            console.log("charge big");
+                    if ( f[x][y] && f[x][y].status == "idle") {
+
+
+                        console.log(x + " " + y + " == " + f[x][y].status)
+
+                        if (x < f.length - 1 && y < f[x].length - 1) {
+
+                            console.log(x + "" + y);
+                            if ((x + 1) >= f.length || y + 1 >= (f[x].length) || y + 1 >= (f[x + 1].length)) {
+
+                                console.log("skip")
+                                //skip
+                            } else if (f[x][y].type == f[x + 1][y].type && f[x][y].type == f[x][y + 1].type && f[x][y].type == f[x + 1][y + 1].type) { //square-match [a0,a1,b0,b1]
+
+                                f[x][y].status = "tl";
+                                f[x + 1][y].status = "tr";
+                                f[x][y + 1].status = "bl";
+                                f[x + 1][y + 1].status = "br";
+
+                                console.log("charge big");
+                            }
+
+                        }
+
+                    }
+
+                    if ( f[x][y] && f[x][y].status == "idle"){
+                        if(y < f[x].length-2) {
+                            if (f[x][y].type == f[x][y + 1].type && f[x][y].type == f[x][y + 2].type) {
+                                f[x][y].status = "sm";
+                                f[x][y + 1].status = "m";
+                                f[x][y + 2].status = "m";
+                                console.log("charge small");
+                                break;
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+
+            for (let y=0; y < 6; y++){
+                let wall = [];
+
+                for (let x=0; x < f.length; x++) {
+                    if (f[x][y] && f[x][y].status == "idle") {
+                        if (wall.length == 0){
+                            wall.push(f[x][y])
+                        } else if (wall[0].type == f[x][y].type) {
+                            wall.push(f[x][y])
+                        } else if (wall.length >= 3){
+                            console.log("wall " + wall + " -- " + wall.length);
+                            for (let w of wall){
+                                w.status = "w";
+                            }
+                        } else {
+                            wall = [];
                         }
                     }
 
-                    if (f[x][y] == f[x][y+1] && f[x][y] == f[x][y+2]){
-                        console.log("charge small");
+                }
+
+                if (wall.length >= 3){
+                    for (let w of wall){
+                        w.status = "w";
                     }
                 }
+
+
 
             }
 
 
         }
+
+        function drop(p,x,u){
+            let y = _g[p].field[x].length;
+            if (y >= 6) {
+                return false;
+            }
+            _g[p].field[x].push(u);
+            Animate.drop(x,y,p);
+
+            return true;
+        }
+
+        //do this before matching, -1hold +growth, do charging skills, apply poisons
+        function charging(){
+
+        }
+
+
+        //do this if field have merging or walling units
+        function merge(){
+            for (let x=0; x < f.length; x++) {
+                for (let y = 0; y < f[x].length; y++) {
+                    if (f[x][y]){
+                        if (f[x][y].status == "sm") {
+                            Animate.small(x,y,p);
+                            Animate.merge1(x,y,p);
+                            Animate.merge2(x,y,p);
+                        }
+                    }
+                }
+            }
+        }
+
+        const Animate = {
+            drop : (x,y,p)=>{
+              let cc = p+""+x+""+y;
+              let u = _g[p].field[x][y];
+              console.log("dropping " + cc + " " + u.type + " " + p);
+
+              $("."+cc).append("<div class='unit enter " + p + "'>" + u.type + "</div>");
+            },
+            small : (x,y,p)=>{
+
+            },
+        }
+
+
+
 
 
         function clog(c){
@@ -74,10 +211,172 @@
             console.log(log);
             return log;
         }
+
+
+
     </script>
 
+    <style>
+        .grid{
+            display: grid;
+            width:320px;
+            grid-template:
+                    'p05 p04 p03 p02 p01 p00 gap e00 e01 e02 e03 e04 e05'
+                    'p15 p14 p13 p12 p11 p10 gap e10 e11 e12 e13 e14 e15'
+                    'p25 p24 p23 p22 p21 p20 gap e20 e21 e22 e23 e24 e25'
+                    'p35 p34 p33 p32 p31 p30 gap e30 e31 e32 e33 e34 e35'
+                    'p45 p44 p43 p42 p41 p40 gap e40 e41 e42 e43 e44 e45'
+                    'p55 p54 p53 p52 p51 p50 gap e50 e51 e52 e53 e54 e55'
+            ;
+            grid-gap:5px;
+            margin:auto;
+        }
+
+        .grid div{
+            text-align:center;
+            height:20px;
+            width:20px;
+        }
+
+        .gap {
+            grid-area: gap;
+            height:10px !important;
+        }
+
+        .unit.enter.p{
+            animation: 1s enter_left ;
+        }
+        .unit.enter.e{
+            animation: 1s enter_right ;
+        }
+
+        @keyframes enter_right{
+            0% {
+                transform: translateX(800%);
+            } 100% {
+                transform: translateX(0%);
+            }
+        }
+
+        @keyframes enter_left{
+            0% {
+                transform: translateX(-800%);
+            } 100% {
+                transform: translateX(0%);
+            }
+        }
+
+        .charging {
+            color:green;
+        }
+    </style>
 </head>
 <body>
+<div class="grid">
+
+    <div class="p05"></div>
+    <div class="p04"></div>
+    <div class="p03"></div>
+    <div class="p02"></div>
+    <div class="p01"></div>
+    <div class="p00"></div>
+    <div class="gap"></div>
+    <div class="e00"></div>
+    <div class="e01"></div>
+    <div class="e02"></div>
+    <div class="e03"></div>
+    <div class="e04"></div>
+    <div class="e05"></div>
+
+    <div class="p15"></div>
+    <div class="p14"></div>
+    <div class="p13"></div>
+    <div class="p12"></div>
+    <div class="p11"></div>
+    <div class="p10"></div>
+    <div class="gap"></div>
+    <div class="e10"></div>
+    <div class="e11"></div>
+    <div class="e12"></div>
+    <div class="e13"></div>
+    <div class="e14"></div>
+    <div class="e15"></div>
+
+    <div class="p25"></div>
+    <div class="p24"></div>
+    <div class="p23"></div>
+    <div class="p22"></div>
+    <div class="p21"></div>
+    <div class="p20"></div>
+    <div class="gap"></div>
+    <div class="e20"></div>
+    <div class="e21"></div>
+    <div class="e22"></div>
+    <div class="e23"></div>
+    <div class="e24"></div>
+    <div class="e25"></div>
+
+    <div class="p35"></div>
+    <div class="p34"></div>
+    <div class="p33"></div>
+    <div class="p32"></div>
+    <div class="p31"></div>
+    <div class="p30"></div>
+    <div class="gap"></div>
+    <div class="e30"></div>
+    <div class="e31"></div>
+    <div class="e32"></div>
+    <div class="e33"></div>
+    <div class="e34"></div>
+    <div class="e35"></div>
+
+    <div class="p45"></div>
+    <div class="p44"></div>
+    <div class="p43"></div>
+    <div class="p42"></div>
+    <div class="p41"></div>
+    <div class="p40"></div>
+    <div class="gap"></div>
+    <div class="e40"></div>
+    <div class="e41"></div>
+    <div class="e42"></div>
+    <div class="e43"></div>
+    <div class="e44"></div>
+    <div class="e45"></div>
+
+    <div class="p55"></div>
+    <div class="p54"></div>
+    <div class="p53"></div>
+    <div class="p52"></div>
+    <div class="p51"></div>
+    <div class="p50"></div>
+    <div class="gap"></div>
+    <div class="e50"></div>
+    <div class="e51"></div>
+    <div class="e52"></div>
+    <div class="e53"></div>
+    <div class="e54"></div>
+    <div class="e55"></div>
+
+
+    <div class="p05"></div>
+    <div class="p04"></div>
+    <div class="p03"></div>
+    <div class="p02"></div>
+    <div class="p01"></div>
+    <div class="p00"></div>
+    <div class="gap"></div>
+    <div class="e00"></div>
+    <div class="e01"></div>
+    <div class="e02"></div>
+    <div class="e03"></div>
+    <div class="e04"></div>
+    <div class="e05"></div>
+
+
+
+</div>
+
 
 
 </body>

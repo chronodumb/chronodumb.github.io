@@ -1,0 +1,52 @@
+<html>
+<head>
+
+
+    <script src="js/jquery.min.js"></script>
+
+    <script>
+
+        //WarQ
+        const effects = {
+        }
+
+
+        class TestUnit {
+            constructor(name){
+                this.name= name;
+                let stat = 6;
+                this.pow = 2 + roll(stat);
+                this.hp= 10 + (stat-this.pow);
+                this.role = "";
+                this.effects=[];
+            }
+        }
+
+        $(document).ready(function(){
+            test();
+        })
+
+        function battle(attacker,defender){
+
+            let damage = 0;
+
+            //before attack
+            for (let ae of attacker.effects){
+                if (ae.beforeAttack){
+                    eval(ae.beforeAttack)
+                }
+            }
+
+        }
+
+        function test{
+
+        }
+
+    </script>
+</head>
+<body>
+    <input type="button" value="next" onclick="turn()"/>
+
+</body>
+</html>

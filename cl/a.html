@@ -1,0 +1,333 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        class TestUnit {
+            constructor(code){
+                this.code= code;
+
+                let stat = 6;
+                this.pow = 2 + roll(stat);
+                this.hp= 10 + (stat-this.pow);
+                this.effects = [];
+            }
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+
+        let game = {
+            a:{
+                name: "player",
+                deck: [],
+                field: [],
+            },
+            e:{
+                name: "enemy",
+                deck: [],
+                field: [],
+            },
+            turn: 0,
+            over: false,
+        }
+
+        $(document).ready(function(){
+            test();
+        });
+        let record = null;
+
+        function test(){
+            //generate 12 random units for each deck
+            for (let i = 1; i <= 12; i++){
+                game.a.deck.push(new TestUnit("Au"+i));
+                game.e.deck.push(new TestUnit("Eu"+i));
+            }
+
+            shuffle(game.a.deck);
+            shuffle(game.e.deck);
+
+            record = clog(game);
+            turn();
+        }
+
+        function turn(){
+            console.log("cl test");
+            if (game.turn % 2 == 0){
+                play("e","a");
+            } else {
+                play("a","e");
+            }
+
+            clog(game);
+
+            if (game.over){
+                console.log("game over")
+                return;
+            }
+
+
+            game.turn++;
+
+            setTimeout(function(){
+                turn();
+            },3000);
+        }
+
+        async function play(atk,def){
+            ally = game[atk];
+            enemy = game[def];
+
+            if (ally.field.length < 4){
+                if (ally.deck.length > 0) {
+                    let a = draw(ally.deck);
+                    let c = "."+atk + "" + ally.field.length;
+
+                    $(c).append("<div class='unit enter " + a.code + "'>" + a.code + "</div>");
+                    setTimeout(function(){
+                        animate(a.code,"idle");
+                    },1000 + roll(1000));
+
+                    ally.field.push(a);
+                    onenter(a);
+                }
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("proceed")
+
+            let x = 0;
+            let y = 0;
+
+            for (let a of ally.field){
+
+                onturn(a);
+                let e = enemy.field[y];
+
+                //do attack
+                if (e){
+                    onattack(a,e);
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    if (e.hp<0){
+                        enemy.field.splice(y,1);
+                    }
+                }
+
+                x++;
+                y=(x < enemy.field.length) ? x : y;
+            }
+
+            if (enemy.field.length ==0 && enemy.deck.length == 0){
+                game.over = true;
+                if (atk == "a"){
+                    console.log("You Win!");
+                } else {
+                    console.log("You Lose")
+                }
+            }
+        }
+
+        function onenter(a){
+            clog(a.code + " joins the battle");
+        }
+
+        function onturn(a){
+            clog(a.code + " turn to move");
+        }
+
+        function onattack(a,e){
+
+            clog(a.code + " attacks ");
+
+            animate(a.code,"attack",1000);
+
+            let damage = a.pow;
+
+            e.hp -= damage;
+
+            if (e.hp < 0){
+                animate(e.code, "death", 1000);
+                setTimeout(function(){
+                    $("."+e.code).remove();
+                },1000);
+                clog(e.code + " dies");
+            }
+
+            clog(e.code + " suffers " + damage + "damage");
+
+        }
+
+        function animate(c,a,t){
+            console.log("idle")
+
+            $("."+c).addClass(a);
+            if (t) {
+                setTimeout(function () {
+                    $("."+c).removeClass(a);
+                }, t)
+            }
+        }
+
+
+
+        function replay(){
+            game = clog(record);
+            while (!game.over){
+                turn();
+            }
+        }
+
+    </script>
+
+    <style>
+        .grid{
+            display: grid;
+            width:60px;
+            grid-template-areas:
+                    'at tp et'
+                    'a0 gp e0'
+                    'a1 gp e1'
+                    'a2 gp e2'
+                    'a3 gp e3'
+                    'ad vs ed'
+                    'ft ft ft'
+            ;
+            grid-gap:5px;
+            margin:auto;
+        }
+
+        .grid div{
+            text-align:center;
+            height:20px;
+            width:20px;
+        }
+
+        .enter{
+            animation: 1s enter;
+        }
+
+        .idle{
+            animation: 2s idle infinite;
+        }
+
+
+        .attack{
+            animation: 1s attack;
+        }
+
+        .death{
+            animation: 1s death;
+        }
+
+        .e {
+            transform: scaleX(-1);
+        }
+
+
+
+        @keyframes enter{
+            0% {
+                transform: translateY(400%);
+                opacity:0;
+            } 100% {
+                  transform: translateY(0%);
+                  opacity:1;
+              }
+        }
+
+
+        @keyframes idle{
+            0% {
+                transform: translateY(0%);
+            }
+            50% {
+                transform: translateY(0%);
+            }
+            60% {
+                transform: translateY(-15%);
+            }
+            100% {
+                transform: translateY(0%);
+            }
+        }
+
+        @keyframes attack{
+            0% {
+                transform: translateX(0%);
+            }
+            30% {
+                transform: translateX(80%) translateY(-60%) rotate(-20deg);
+            }
+            40% {
+                transform: translateX(100%) translateY(-10%) rotate(40deg);
+            }
+            90% {
+                transform: rotate(-20deg);
+            }
+            100% {
+                transform: translateY(0%);
+            }
+        }
+
+        @keyframes death{
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(90%);
+                display: none;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<div class="grid">
+    <div class="a at"> </div>
+    <div class="x tp"> </div>
+    <div class="e et"> </div>
+    <div class="a a0"> </div>
+    <div class="x gp"> </div>
+    <div class="e e0"> </div>
+    <div class="a a1"> </div>
+    <div class="x gp"> </div>
+    <div class="e e1"> </div>
+    <div class="a a2"> </div>
+    <div class="x gp"> </div>
+    <div class="e e2"> </div>
+    <div class="a a3"> </div>
+    <div class="x gp"> </div>
+    <div class="e e3"> </div>
+    <div class="a ad"> </div>
+    <div class="x vs"> </div>
+    <div class="e ed"> </div>
+    <div class="a ft"> </div>
+    <div class="x ft"> </div>
+    <div class="e ft"> </div>
+</div>
+
+</body>
+</html>
