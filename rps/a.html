@@ -1,0 +1,152 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        class Player {
+            constructor(name, deck, seat){
+                this.name = name;
+                this.deck = deck;
+                this.hand = [];
+                this.field = null;
+                this.hp = 3;
+                this.rank = 0;
+                this.seat = 0;
+            }
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function pick(deck){
+            let c = deck[roll(deck.length)];
+            return c;
+        }
+
+        function pluck(deck){
+            let c = deck.splice(roll(deck.length),1);
+            return c;
+        }
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+
+        let game = {
+            players:[],
+            turn: 0,
+            rank: 12
+        }
+
+        $(document).ready(function(){
+            test();
+        });
+        let record = null;
+
+        const cards= ['r','p','s'];
+
+        function test(){
+            //add ten players
+            let players = [];
+            for (let i = 1; i <= 12; i++){
+                let deck = [];
+                for (let x = 1; x <= 12; x++){
+                    deck.push(roll(3));
+                }
+                shuffle(deck);
+                players.push(new Player("p"+i,deck, i));
+            }
+            game.players = players;
+
+            clog(game);
+
+            turn();
+        }
+
+        const filter = (array, condition) => array.filter(obj => eval(condition) );
+
+        function turn(){
+            game.turn++;
+            console.log("turn " + game.turn);
+
+            let players = filter(game.players,"obj.hp > 0");
+
+            //draw phase
+            for (let p of players){
+                while (p.hand.length<4 && p.deck.length > 0) {
+                    p.hand.push(draw(p.deck));
+                }
+            }
+
+            //summon phase
+            for (let p of players){
+                if (p.hand.length > 0){
+                    p.field = pluck(p.hand);
+                }
+            }
+
+            //battle phase
+            for (let p of players){
+                target = pick(players);
+                battle(p, target);
+            }
+
+            clog(game);
+
+            if (game.rank > 1) {
+                setTimeout(function() {
+                    turn();
+                },100)
+            }
+        }
+
+        function battle(attacker,blocker){
+            let a = attacker.field;
+            let b = blocker.field;
+
+            if (a != null && b != null){
+                let d = (3 + a - b) % 3;
+
+                if (d % 2 == 1){
+                    blocker.field = null;
+                    damage(blocker);
+                } else if (d % 2 == 0){
+                    attacker.field = null;
+                }
+            } else if (a!=null && b==null) {
+                damage(blocker)
+            }
+        }
+
+        function damage(blocker){
+            if (blocker.hp > 0){
+                blocker.hp--;
+            } else if (blocker.hp == 0){
+                blocker.rank = game.rank;
+                game.rank--;
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
