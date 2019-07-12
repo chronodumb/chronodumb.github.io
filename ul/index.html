@@ -1,0 +1,172 @@
+<html>
+    <head>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery-sortable-min.js"></script>
+        <script>
+            $(document).ready(function(){
+                var oldList, newList, item;
+                $('.sortable').sortable({
+                    start: function(event, ui) {
+                        item = ui.item;
+                        newList = oldList = ui.item.parent().parent();
+                    },
+                    stop: function(event, ui) {
+                        alert("Moved " + item.text() + " from " + oldList.attr('id') + " to " + newList.attr('id'));
+                    },
+                    change: function(event, ui) {
+                        if(ui.sender) newList = ui.placeholder.parent().parent();
+                    },
+                    connectWith: ".sortable"
+                })
+            })
+        </script>
+        <script>
+
+            const _copiesInPool = [45,30,25,15,10]
+            const _tierOdds = [[100,0,0,0,0],[70,30,0,0,0],[60,35,5,0,0],[50,35,15,0,0],[40,35,23,2,0],[33,30,30,7,0],[30,30,30,10,0],[24,30,30,15,1],[22,25,30,20,3],[19,25,25,25,6],[13,20,25,30,12]]
+            const _totalPoolSize = [630,420,375,180,50]
+            const _heroes = {
+                "ANTI-MAGE" : {name:"ANTI-MAGE",level:1,tier:1,alliance:["Demon-Hunter"]},
+                "AXE" :  {name:"AXE",level:1,tier:1,alliance:["Brawn","Warrior"]},
+                "BATRIDER" :  {name:"BATRIDER",level:1,tier:1,alliance:["Troll","Knight"]},
+                "BLOODSEEKER" : {name: "BLOODSEEKER",level:1,tier:1,alliance:["Human","Assassin"]},
+                "BOUNTY_HUNTER" : {name: "BOUNTYHUNTER",level:1,tier:1,alliance:["Scrappy","Assassin"]},
+                "CLOCKWERK" : {name: "CLOCKWERK",level:1,tier:1,alliance:["Scrappy","Inventor"]},
+                "DROW_RANGER" : {name: "DROW_RANGER",level:1,tier:1,alliance:["Heartless","Hunter"]},
+                "ENCHANTRESS" : {name: "ENCHANTRESS",level:1,tier:1,alliance:["Savage","Druid"]},
+                "OGRE_MAGI" : {name: "OGRE_MAGI",level:1,tier:1,alliance:["Bloodbound","Mage"]},
+                "SHADOW_SHAMAN" : {name: "SHADOW_SHAMAN",level:1,tier:1,alliance:["Troll","Shaman"]},
+                "TINKER" : {name: "TINKER",level:1,tier:1,alliance:["Scrappy","Inventor"]},
+                "TUSK" : {name: "TUSK",level:1,tier:1,alliance:["Savage","Warrior"]},
+                "WARLOCK" : {name: "WARLOCK",level:1,tier:1,alliance:["Bloodbound","Warlock"]},
+            }
+
+            class Hero {
+                constructor(hero){
+                    this.name = hero.name;
+                    this.level = hero.level;
+                    this.tier = hero.tier;
+                }
+            }
+
+            let userLvl = 1;
+            let players= {
+                0: {board:{},bench:{}},1:{board:{},bench:{}},2:{board:{},bench:{}},3:{board:{},bench:{}},4:{board:{},bench:{}},5:{board:{},bench:{}},6:{board:{},bench:{}},7:{board:{},bench:{}}
+            }
+
+
+
+            test();
+
+            function test(){
+                addHero(0,"board","AXE");
+                addHero(1,"board","ANTI-MAGE");
+                addHero(2,"bench","ANTI-MAGE");
+
+                individualOdds("ANTI-MAGE")
+                console.log(players);
+            }
+
+            function addHero(player,position,name){
+                let hero = new Hero(_heroes[name]);
+                players[player][position][hero.name]= hero;
+            }
+
+            function getHitsOutOfPool(hero_name){
+                let hits = 0;
+                for (let p of Object.values(players)){
+                    if (p.board[hero_name]){
+                        hits+= (p.board[hero_name].level == 1) ? 1 : p.board[hero_name].level * 3;
+                    }
+                    if (p.bench[hero_name]){
+                        hits+= (p.bench[hero_name].level == 1) ? 1 : p.bench[hero_name].level * 3;
+                    }
+                }
+                return hits;
+            }
+
+            function getTierHitsOutOfPool(name){
+                for (let p of Object.values(players)){
+
+                }
+                return 0;
+            }
+
+            function individualOdds(hero_name){
+                let hero = _heroes[hero_name];
+
+                let targetTier = hero.tier;
+                let hitsOutOfPool = getHitsOutOfPool(hero_name);
+                let missesOutOfPool = getTierHitsOutOfPool(hero_name) - hitsOutOfPool;
+
+                let oddsOfHittingTier = _tierOdds[userLvl-1][targetTier-1]
+                oddsOfHittingTier = oddsOfHittingTier/100
+
+                console.log("odds of hitting in your tier are " + (oddsOfHittingTier))
+
+                my_copiesInPool = _copiesInPool[targetTier-1] - hitsOutOfPool
+                myPoolSize = _totalPoolSize[targetTier-1] - (missesOutOfPool+ hitsOutOfPool)
+
+                console.log("your copies in the pool are " + (my_copiesInPool) + " the total pool size is " + (myPoolSize))
+
+                odds = 5 * (my_copiesInPool/myPoolSize)*oddsOfHittingTier
+
+                console.log("your odds " + odds);
+            }
+        </script>
+
+        <style>
+            body.dragging, body.dragging * {
+                cursor: move !important;
+            }
+
+            .dragged {
+                position: absolute;
+                opacity: 0.5;
+                z-index: 2000;
+            }
+
+            ul{
+                list-style-type: none;
+            }
+
+            /*li {
+                float: left;
+                cursor:pointer;
+                width: 60px;
+            }*/
+
+            ul.example li.placeholder {
+                position: relative;
+                /** More li styles **/
+            }
+            ul.example li.placeholder:before {
+                position: absolute;
+                /** Define arrowhead **/
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <ul class="sortable" >
+                <li>Item 1</li>
+                <li>Item 2</li>
+                <li>Item 3</li>
+                <li>Item 4</li>
+                <li>Item 5</li>
+                <li>Item 6</li>
+            </ul>
+        </div>
+        <div>
+            <ul class="sortable" >
+                <li class="highlight">Item 1</li>
+                <li class="highlight">Item 2</li>
+                <li class="highlight">Item 3</li>
+                <li class="highlight">Item 4</li>
+                <li class="highlight">Item 5</li>
+                <li class="highlight">Item 6</li>
+            </ul>
+        </div>
+    </body>
+</html>
