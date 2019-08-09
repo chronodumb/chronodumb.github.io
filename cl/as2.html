@@ -1,0 +1,47 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            asynctest();
+        })
+
+        function asynctest(){
+            let timer = 0;
+            let intee = setInterval(function(){
+                timer++;
+                console.log(timer);
+            },1000);
+
+            action().then(r=>{
+                console.log(r);
+            })
+
+            if (timer > 100)
+                clearInterval(intee);
+        }
+
+        async function action(){
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("doing action");
+            return "p";
+        }
+
+        async function sleep(fn, ...args) {
+            await timeout(3000);
+            console.log("sleeping " + sleep);
+            return fn(...args);
+        }
+
+        function timeout(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

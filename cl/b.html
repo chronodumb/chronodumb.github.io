@@ -1,0 +1,248 @@
+<html>
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        class TestUnit {
+            constructor(code){
+                this.code= code;
+
+                let stat = 6;
+                this.pow = 2 + roll(stat);
+                this.hp= 10 + (stat-this.pow);
+                this.effects = [];
+            }
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+
+        let game = {
+            a:{
+                name: "player",
+                deck: [],
+                field: [],
+            },
+            e:{
+                name: "enemy",
+                deck: [],
+                field: [],
+            },
+            turn: 0,
+            status: "play",
+        }
+
+        $(document).ready(function(){
+            test();
+        });
+        let record = null;
+
+        function test(){
+            //generate 12 random units for each deck
+            for (let i = 1; i <= 12; i++){
+                game.a.deck.push(new TestUnit("Au"+i));
+                game.e.deck.push(new TestUnit("Eu"+i));
+            }
+
+            shuffle(game.a.deck);
+            shuffle(game.e.deck);
+
+            record = clog(game);
+            turn();
+        }
+
+        function turn(){
+            console.log("cl test");
+            let action = null;
+            if (game.turn % 2 == 0){
+                action = new Promise(result=>play("e","a")) ;
+            } else {
+                play("a","e");
+            }
+
+            clog(game);
+
+            if (game.status == "over"){
+                console.log("game over")
+                return;
+            }
+
+            if (game.status == "pause"){
+                console.log("pause")
+                return;
+            }
+
+
+            game.turn++;
+
+            setTimeout(function(){
+                turn();
+            },3000);
+        }
+
+        async function play(atk,def){
+            ally = game[atk];
+            enemy = game[def];
+
+            if (ally.field.length < 4){
+                if (ally.deck.length > 0) {
+                    let a = draw(ally.deck);
+
+                    $("."+atk).prepend("<div class='unit enter " + a.code + "'>" + a.code + "</div>");
+                    setTimeout(function(){
+                        animate(a.code,"idle");
+                    },1000 + roll(1000));
+
+                    ally.field.push(a);
+                    onenter(a);
+                }
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("proceed")
+
+            let x = 0;
+            let y = 0;
+
+            for (let a of ally.field){
+
+                onturn(a);
+                let e = enemy.field[y];
+
+                //do attack
+                if (e){
+                    onattack(a,e);
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    if (e.hp<0){
+                        enemy.field.splice(y,1);
+                    }
+                }
+
+                x++;
+                y=(x < enemy.field.length) ? x : y;
+            }
+
+            if (enemy.field.length ==0 && enemy.deck.length == 0){
+                game.status = "over";
+                if (atk == "a"){
+                    console.log("You Win!");
+                } else {
+                    console.log("You Lose")
+                }
+            }
+        }
+
+        function onenter(a){
+            clog(a.code + " joins the battle");
+        }
+
+        function onturn(a){
+            clog(a.code + " turn to move");
+        }
+
+        function onattack(a,e){
+
+            clog(a.code + " attacks ");
+
+            animate(a.code,"attack",1000);
+
+            let damage = a.pow;
+
+            e.hp -= damage;
+
+            if (e.hp < 0){
+                animate(e.code, "death", 1000);
+                setTimeout(function(){
+                    $("."+e.code).remove();
+                },1000);
+                clog(e.code + " dies");
+            }
+
+            clog(e.code + " suffers " + damage + "damage");
+
+        }
+
+        function animate(c,a,t){
+            console.log("idle")
+
+            $("."+c).addClass(a);
+            if (t) {
+                setTimeout(function () {
+                    $("."+c).removeClass(a);
+                }, t)
+            }
+        }
+
+
+
+        function replay(){
+            game = clog(record);
+            while (game.status != "over"){
+                turn();
+            }
+        }
+
+        function pause(){
+            game.status = "pause";
+        }
+
+        function resume(){
+            game.status = "play";
+            turn();
+        }
+
+        function stop(){
+            game.status = "stop";
+        }
+
+    </script>
+
+    <style>
+        .a {
+            width: 300px;
+            height: 30px;
+        }
+        .e {
+            width: 300px;
+            height: 30px;
+        }
+        .unit {
+            float:left;
+        }
+    </style>
+</head>
+<body>
+<div class="field">
+    <div class="a">
+
+    </div>
+    <div class="e">
+
+    </div>
+</div>
+
+</body>
+</html>

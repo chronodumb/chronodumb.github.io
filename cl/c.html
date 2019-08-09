@@ -1,0 +1,202 @@
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+        class TestUnit {
+            constructor(code){
+                this.code= code;
+
+                let stat = 6;
+                this.pow = 2 + roll(stat);
+                this.hp= 10 + (stat-this.pow);
+                this.effects = [];
+            }
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function clog(c){
+            let log = JSON.parse(JSON.stringify(c));
+            console.log(log);
+            return log;
+        }
+
+        let game = {
+            a:{
+                name: "player",
+                deck: [],
+                field: [],
+            },
+            e:{
+                name: "enemy",
+                deck: [],
+                field: [],
+            },
+            turn: 0,
+            status: "play",
+            speed: 1,
+        }
+
+        $(document).ready(function(){
+            test();
+        });
+        let record = null;
+
+
+        function test(){
+            //generate 12 random units for each deck
+            document.documentElement.style.setProperty("--speed", game.speed+"s");
+
+            for (let i = 1; i <= 12; i++){
+                game.a.deck.push(new TestUnit("A"+i));
+                game.e.deck.push(new TestUnit("E"+i));
+            }
+
+
+            shuffle(game.a.deck);
+            shuffle(game.e.deck);
+
+            record = clog(game);
+            turn();
+        }
+
+        async function turn() {
+            console.log("turn");
+
+            let action = null;
+            if (game.turn % 2 == 0){
+                action = play("e","a");
+            } else {
+                action = play("a","e");
+            }
+
+            console.log(action)
+
+            console.log("oooooo")
+
+            game.turn++;
+            action.then(r=>{
+                setTimeout(function(){
+                    turn();
+                },1000*game.speed)
+            })
+
+        }
+
+        async function play(atk,def){
+
+            ally = game[atk];
+            enemy = game[def];
+
+            let action = null;
+
+            if (ally.field.length < 4){
+                if (ally.deck.length > 0) {
+                    let a = draw(ally.deck);
+
+                    $("."+atk).append("<div class='unit enter " + a.code + "'>" + a.code + "</div>");
+                    action = await new Promise(resolve => setTimeout(function(){
+                        animate(a.code,"idle");
+                        resolve();
+                    }, (1000 * game.speed) + roll(1000)));
+
+
+                    ally.field.push(a);
+                    onenter(a);
+                }
+            }
+
+
+        }
+
+        function animate(c,a,t){
+            $("."+c).addClass(a);
+            if (t) {
+                setTimeout(function () {
+                    $("."+c).removeClass(a);
+                }, t)
+            }
+        }
+
+        function onenter(){
+
+        }
+
+
+    </script>
+
+    <style>
+        :root{
+            --speed : 2s;
+        }
+
+        .a {
+            display:inline-block;
+            width: 50px;
+            height: 200px;
+            transform: scaleX(-1);
+        }
+        .e {
+            display:inline-block;
+            width: 50px;
+            height: 200px;
+        }
+        .unit{
+            width:30px;
+            margin:5px;
+        }
+        .unit{
+            float:left;
+        }
+        .unit.enter{
+            animation: enter var(--speed) ease;
+        }
+        .unit.idle{
+            animation: idle var(--speed) ease infinite;
+        }
+
+
+        @keyframes enter{
+            0% {
+                transform:  translate(400%,0px); opacity:0 ;
+            }
+            100% {
+                transform:  translate(0px,0px); opacity:1 ;
+            }
+        }
+
+        @keyframes idle{
+            0%{transform: translate(0,0)}
+            70%{transform: translate(0,0)}
+            76%{transform: translate(0,-20%)}
+            80%{transform: translate(0,0)}
+            100%{transform: translate(0,0)}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="field">
+        <div class="a">
+        </div>
+        <div class="e">
+        </div>
+    </div>
+</body>
+</html>
