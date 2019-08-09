@@ -1,0 +1,66 @@
+<head>
+    <script src="../js/jquery.min.js"></script>
+    <script>
+
+        let a="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        let union = [];
+        let heroes = [];
+        let pool = [];
+
+        class Hero{
+            constructor(h){
+                this.name = h.name;
+                this.union = h.union;
+                this.rarity = h.rarity;
+            }
+        }
+
+        function test(){
+            generateTestData();
+        }
+
+
+        function generateTestData(){
+            union = a.split("");
+            console.log(union);
+
+            for (let x=0; x < union.length; x++){
+                for (let y = x+1; y < union.length; y++){
+                    let ux = union[x]; let uy = union[y];
+
+                    if (roll(100) < 20){
+                        let hero = {name: ux+uy, union : [ux,uy],rarity:rollRarity()};
+                        heroes.push(hero);
+                    }
+                }
+            }
+
+            console.log(heroes);
+        }
+
+        function rollRarity(){
+            let r = roll(100);
+            if (r < 10)
+                return 5;
+            if (r < 20)
+                return 4;
+            if (r < 40)
+                return 3;
+            if (r < 60)
+                return 2;
+
+            return 1;
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        test();
+    </script>
+</head>
+<body>
+
+</body>
+</html>
