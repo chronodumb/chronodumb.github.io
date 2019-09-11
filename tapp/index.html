@@ -1,0 +1,84 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <script>
+
+
+        Number.prototype.ex = function (){
+            if (this >= 1000)
+                return this.toExponential(2).replace("+", "");
+            else
+                return this.toString();
+        };
+
+        Number.prototype.pretty = function (){
+            if (this >= 1e3 && this < 1e6)
+                return (this/1e3).toFixed(1) + " K"
+            else if (this >= 1e6 && this < 1e9)
+                return (this/1e6).toFixed(1) + " M"
+            else if (this >= 1e9 && this < 1e12)
+                return (this/1e9).toFixed(1) + " B"
+            else if (this >= 1e12 && this < 1e15)
+                return (this/1e12).toFixed(1) + " T"
+            else
+                return this.ex();
+        };
+
+        Number.prototype.prettyz = function (){
+
+            if (this.ex() == "infinity"){
+                return this;
+            }
+
+            var az = "abcdefghijklmnopqrstuvwxyz";
+
+            if (this >= 1000) {
+                let s = this.ex().split("e")[1];
+
+                let e = this;
+
+                let m = Math.floor(s/3);
+                e = e / (1000 ** m);
+
+                return e.toFixed(2) + " " + getSuffix(m-1);
+
+                function getSuffix(m,sx = ""){
+                    let n = Math.floor(m  ** 1/26);
+                    if (n > 0){
+                        sx = sx + az.charAt(n-1);
+                        m = m - (n*26);
+                        return getSuffix(m,sx);
+                    } else{
+                        return sx + az.charAt(m);
+                    }
+
+                }
+            }
+
+            return this;
+        };
+
+
+
+        console.log( 676 ** 1/26 )
+
+
+        console.log((1000000000000000000000000000000000000).ex());
+
+
+        var z = 12;
+
+        setInterval(function(){
+            z+=z;
+            console.log(z.prettyz());
+        },1000);
+
+
+    </script>
+</head>
+<body>
+
+</body>
+
+</html>
