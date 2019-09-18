@@ -48,3 +48,14 @@ Types of event cards:
 Character Cards
 Port Cards
 Disaster Cards
+
+
+
+cargo
+
+foods
+goods
+spices
+luxaries
+treasures
+contrabands
