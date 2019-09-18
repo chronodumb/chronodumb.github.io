@@ -4,16 +4,15 @@ Captain
 Quartermaster
 Navigator
 Boatswain
-Master Gunner
-Cook
+Canoneer
 
 
 Extras
-
 Crew
 
 Bonus cast
 
+Master Chef
 Doctor
 Shipwright
 Merchant
@@ -34,7 +33,8 @@ and more
 Things to watch out:
 
 Food - Consumed every day based on upkeep. Lower food, lowers mood. 0 food means death from starvation
-Arms - Can determine the win/lose from raids. Winning raids gives gold. Loosing raids lowers moods.
+Crew - Number of disposable crew members. They die during raids.
+Arms - Can determine the win/lose from raids. Winning raids gives loots and fame. Loosing raids loose .
 Mood - Higher mood gives better results. Lower mood might cause rebellion.
 Ship - lower ship power might cause navigator estimates to fail
 Gold - used to buy supplies.
@@ -45,9 +45,10 @@ Port - Cards left until next port.
 
 Types of event cards:
 
-Character Cards
-Port Cards
-Disaster Cards
+Character Cards - each character contains several tied in events for their *arc*.
+Port Cards - can offer services, attack your fleet, etc
+Raid Cards -
+Disaster Cards -
 
 
 
