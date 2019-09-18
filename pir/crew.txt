@@ -1,0 +1,50 @@
+Main cast
+
+Captain
+Quartermaster
+Navigator
+Boatswain
+Master Gunner
+Cook
+
+
+Extras
+
+Crew
+
+Bonus cast
+
+Doctor
+Shipwright
+Merchant
+
+Extended cast
+
+Piper
+Seer
+Powder Monkey
+Falconer
+Dragon Tamer
+and more
+
+
+
+
+
+Things to watch out:
+
+Food - Consumed every day based on upkeep. Lower food, lowers mood. 0 food means death from starvation
+Arms - Can determine the win/lose from raids. Winning raids gives gold. Loosing raids lowers moods.
+Mood - Higher mood gives better results. Lower mood might cause rebellion.
+Ship - lower ship power might cause navigator estimates to fail
+Gold - used to buy supplies.
+Travel - Amount of time spent in sea.
+Port - Cards left until next port.
+
+
+
+Types of event cards:
+
+Character Cards
+Port Cards
+Disaster Cards
