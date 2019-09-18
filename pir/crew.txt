@@ -19,12 +19,20 @@ Merchant
 
 Extended cast
 
+Fisherman
 Piper
 Seer
 Powder Monkey
 Falconer
 Dragon Tamer
 and more
+
+
+Upgrades:
+Quartermaster -> Lieutenant
+Navigator -> Sailing Master
+Boatswain -> Cargo Cooper
+Canoneer -> Master Gunner
 
 
 
