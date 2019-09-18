@@ -1,0 +1,4 @@
+#,Char,Message,[Optionals]
+1,"_title","Blah blah blah",{"bg":"","bgm":""}
+2,"Char1","Blah blah blah",
+3,"_choice",["Hey","Nay"],[20,1],
