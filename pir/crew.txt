@@ -60,3 +60,7 @@ spices
 luxaries
 treasures
 contrabands
+
+
+Navi, Quar, Cano , Boat
+FAME, MOOD, POWER, SHIP
