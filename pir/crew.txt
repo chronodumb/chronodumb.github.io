@@ -1,25 +1,25 @@
 Main cast
 
 Captain
-Quartermaster
-Navigator
-Master Gunner
-Purser
+Quartermaster - Loyalty
+Navigator - Direction
+Purser - Supplies
 
 Extras
 Crew
 
 Bonus cast
 
-Doctor
-Shipwright
-Boatswain
+Doctor - Crew Health (Loyalty and Power)
+Shipwright - Ship
+Boatswain - cordage and sails
+Master Gunner - Power
 
 Extended cast
 
 Fisherman
 Master Chef
-Merchant
+Merchant Trader
 Snake Charmer
 Monk
 Seer
@@ -33,13 +33,21 @@ Bard
 Engineer
 runeseeker
 jeweller
+Criminal
+Chaplain
+Scouts, Spy, ninjas
+Ghost
+
 
 and more
 
 
 
 
+---
 
+
+food, mood, boat
 
 
 Things to watch out:
@@ -74,13 +82,23 @@ treasures
 contrabands
 
 
-Navi, Quar, Cano , Boat
-MOOD, FAME, POWER, SHIP
-
-
 Deaths.
 Mutiny
 Lost
 Captured
 Sunk
 
+
+
+Days to next port
+
+
+Port cards.
+
+Guild - navigator - off to get new route, destination, bounty, and quests
+Pub - quartermaster - recruit new crew members, get drunk
+Market - purser - buy supplies
+
+
+
+example. buy navigator telescope. unlocks, uncharted island scenarios.
