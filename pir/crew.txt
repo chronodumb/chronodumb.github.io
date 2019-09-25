@@ -3,36 +3,40 @@ Main cast
 Captain
 Quartermaster
 Navigator
-Boatswain
-Canoneer
-
+Master Gunner
+Purser
 
 Extras
 Crew
 
 Bonus cast
 
-Master Chef
 Doctor
 Shipwright
-Merchant
+Boatswain
 
 Extended cast
 
 Fisherman
-Piper
+Master Chef
+Merchant
+Snake Charmer
+Monk
 Seer
 Powder Monkey
 Falconer
 Dragon Tamer
+Scholar
+BlackSmith
+Stow away
+Bard
+Engineer
+runeseeker
+jeweller
+
 and more
 
 
-Upgrades:
-Quartermaster -> Lieutenant
-Navigator -> Sailing Master
-Boatswain -> Cargo Cooper
-Canoneer -> Master Gunner
 
 
 
