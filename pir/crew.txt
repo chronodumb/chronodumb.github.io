@@ -3,7 +3,7 @@ Main cast
 Captain
 Quartermaster - Loyalty
 Navigator - Direction
-Purser - Supplies
+Cooper - Supplies
 
 Extras
 Crew
@@ -14,6 +14,7 @@ Doctor - Crew Health (Loyalty and Power)
 Shipwright - Ship
 Boatswain - cordage and sails
 Master Gunner - Power
+Amnesiac- ???
 
 Extended cast
 
