@@ -1,0 +1,9 @@
+armors
+
+helm - prevent 6
+cuirass - prevent 5
+bracers - prevent 4
+greaves - prevent 3
+
+gauntlet -
+boots -
