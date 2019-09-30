@@ -2,15 +2,18 @@ draw 3. choose 1, discard the rest.
 
 
 
+
+
+
+
 armors
 
 helm - prevent 6
 cuirass - prevent 5
 bracers - prevent 4
 greaves - prevent 3
-
-gauntlet -
-boots -
+gauntlet - prevent 2
+boots - prevent 1
 
 
 enemy types
@@ -19,3 +22,10 @@ enemy types
 beasts
 undead
 dragon
+
+
+heroes
+
+
+fencer - parry. break weapon to use as shield. sword mastery. power+1 when using sword. starts with a sword.
+knight - shieldcharge. deal double roll damage, breaks shield (no attack modifier for this). shieldbearer. starts with a shield and sword.

@@ -2,6 +2,55 @@
     <head>
         <script>
 
+
+            var _deck = [];
+
+
+            function init(){
+
+            }
+
+            function genDeck(){
+                genCard("potion",6,2);
+                genCard("monster",9,1)
+            }
+
+            function genCard(n,x,c=1){
+                for (let a=1; a<=c; a++) {
+                    for (let i = 1; i < x; i++) {
+                        let card = {
+                            name: n + i,
+                            type: n,
+                            power: i,
+                        }
+                    }
+                }
+            }
+
+            function render(){
+
+            }
+
+            function roll(){
+                return Math.floor(Math.random() * ((6 - 1) + 1) + 1);
+            }
+
+            function shuffle(array) {
+                log("shuffle")
+
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+            }
+
+            function draw(array){
+                var card = array.splice(0,1)[0];
+                return card;
+            }
+
         </script>
     </head>
     <body>
