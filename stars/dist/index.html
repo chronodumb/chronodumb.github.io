@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>particles.js demo / Stars version</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div id="score" class="count-particles"> <span class="js-count-particles"></span></div>
+
+<div id="upgradeTap" onclick="upgradeTap()" style="display:none;">+1(-20)</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
+
+<script  src="./script.js"></script>
+
+<script>
+    var _score = 0;
+    var _pertap = 1;
+
+    function upgradeTap(){
+        var cost = _pertap*_pertap*20;
+        if (_score > cost){
+            _score -= cost;
+            _pertap++;
+            cost = _pertap*_pertap*20;
+            document.getElementById("upgradeTap").innerHTML = "+" + _pertap + "(-" + cost + ")";
+        }
+    }
+
+</script>
+
+
+</body>
+</html>

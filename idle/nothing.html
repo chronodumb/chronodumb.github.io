@@ -1,0 +1,66 @@
+<head>
+    <script>
+        var _score = 0;
+        var _pertap = 1;
+
+
+        var _tick = 1000;
+
+        function tap(){
+            _score+=_pertap;
+            render();
+        }
+
+        setInterval(function(){loop()},_tick);
+
+        function loop(){
+
+            render();
+
+        }
+
+        function upgradeTap(){
+            var cost = _pertap*_pertap*20;
+            if (_score > cost){
+                _score -= cost;
+                _pertap++;
+                cost = _pertap*_pertap*20;
+                document.getElementById("upgradeTap").innerHTML = "+" + _pertap + "(-" + cost + ")";
+            }
+        }
+
+        function render(){
+            document.getElementById("score").innerHTML = _score;
+            if (_score > _pertap*_pertap*20){
+                document.getElementById("upgradeTap").classList = "available";
+            } else if ( _pertap > 1){
+                document.getElementById("upgradeTap").classList = "disable";
+            }
+        }
+
+    </script>
+    <style>
+        body{
+            user-select: none;
+        }
+
+        .disable{
+            opacity: 0.25 !important;
+            display: block !important;
+            pointer-events: none;
+        }
+
+        .available{
+            opacity: 1.0 !important;
+            display: block !important;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body onclick="tap()" onkeypress="tap()">
+    <div id="score" style="pointer-events: none;user-select: none;">0</div></br>
+
+    <div id="upgradeTap" onclick="upgradeTap()" style="display:none;">+1(-20)</div>
+</body>
