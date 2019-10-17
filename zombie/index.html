@@ -1,0 +1,46 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <script>
+
+        /// zombie deck
+
+        const _resources = ["survivor","captives","ration","ammo","fuel","anxiety"]
+
+        var _deck = [];
+
+        function init(){
+
+        }
+
+        function buildDeck(...ext){
+
+        }
+
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+</body>
+
+</html>

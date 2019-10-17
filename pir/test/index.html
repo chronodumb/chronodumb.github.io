@@ -4,22 +4,104 @@
 
     <script>
 
-        var _game = {
-            stats: {
-                morale: 100,
-                supply : 100,
-                power: 100,
-                ship: 100,
-                treasure : 100,
-            },
-            flags: {
+        /// working title: Sky End
 
+        const _event_pool={
+            crew: {
+                "navigator" : {
+                    //events go here?
+                }
             },
-            days:1,
-            explored:0,
+            ports: {
+                "guild": {
+
+                }
+            },
+
         }
 
-        getActis
+        const _deaths={
+            "lost" : "", //wealth = 0
+            "mutiny" : "", //morale = 0
+            "captured" : "", //power = 0,
+            "sink" : "", //ship = 0,
+            "hanging" : "",
+            "hunger" : "",
+            "assassinated" : "",
+            "kraken" : "",
+        }
+
+        var _player={
+            deaths: {
+
+            }, //unlockable achievements
+            wealth: 0, //highscore?
+            fame: 0, //prestige points, collect to unlock new crew members??
+        }
+
+        var _game = {
+            stats: {
+                wealth: 100,    //navigator
+                morale: 100,    //quartermaster
+                power:  100,    //mastergunner
+                ship:   100,    //boatswain
+            },
+            crew:{ //flag specific for crew, changes crew-related event cards accordingly
+                "navigator": {
+
+                },
+                "quartermaster": {
+
+                },
+                "mastergunner": {
+
+                },
+                "boatswain": {
+
+                },
+            },
+            flags: { //flag for all events.
+
+            },
+            ports:[],
+            explored:0,
+            night:false,
+            weather:0, //fair, misty, rainy, stormy, changes scenery
+        }
+
+        var _deck = [];
+
+        function init(){
+
+        }
+
+        function buildDeck(...ext){
+
+        }
+
+        function buildPorts(){
+
+        }
+
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
     </script>
 </head>
 <body>
