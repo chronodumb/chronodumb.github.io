@@ -9,13 +9,15 @@
 
         start();
 
-        //add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives food,
-        //
-        // Escape - stop scavenging and run home
-        //
 
         function start() {
             _g = new Game();
+
+            // startup
+            // add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives food,
+            //
+            // Escape - stop scavenging and run home
+            //
 
             new Round();
         }
@@ -44,18 +46,35 @@
         function Round(){
             console.log(_g.players);
 
+
             console.log("Day " + _g.rno);
             //Day Turn scavenge phase
             for (var p of _g.players) {
-                new scavenge(p);
+
+
+                //prepare(p) <-- allows players to move items between hands and stock pile...
+                scavenge(p);
             }
 
-            //Night Turn stockpiling, trading
+            //Night Turn trading
             console.log("Night " + _g.rno);
+
+            //options: Trade, Trick, Threat, Transmute(special chars only)
+
+            //trade... example, p1 says, "I need water" then show your offer. every player must show their water and  trading is 1 is to 1 only.
+            //trick... you can ask for random item in exchange for another random item.
+            //threat... demand and item from a user and threaten to shoot.
+                // give in- the target gives you the item for free
+                // resist- the target threatens you back.
+                    //backout - cancel the threat. you don't get anything this turn
+                    //fight. both you and target must pay a bullet. Anyone who cannot pay bullet must pay a heart
+
 
 
             //END TURN
             //spend 1 FOOD, 1 WATER, 1 AIR... Use a heart for every item you cannot pay.
+            //automatically remove items in stockpile first, then hands
+            //Pay heart to remove poison, else it gets stuck in your hands
         }
 
         function scavenge(p){
@@ -89,15 +108,15 @@
                 deck.push("FOOD")
                 deck.push("WATER")
                 deck.push("AIR")
-                deck.push("JUNK")
+                deck.push("PARTS")
                 i++;
             }
 
             i=0;
             while (i < 10) {
                 deck.push("MONSTER")
-                deck.push("POISON")
                 deck.push("BULLET")
+                deck.push("POISON")
                 deck.push("ANTIDOTE")
                 i++;
             }
