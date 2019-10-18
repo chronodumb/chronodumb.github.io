@@ -1,0 +1,134 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <script>
+        //Working title: Scavenger Shuffle
+
+        var _g = {};
+
+        start();
+
+        //add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives food,
+        //
+        // Escape - stop scavenging and run home
+        //
+
+        function start() {
+            _g = new Game();
+
+            new Round();
+        }
+
+        function Game(){
+            console.log("new game starts");
+            this.players = [
+                new Player("p1",0),
+                new Player("a2",1),
+                new Player("a3",2),
+                new Player("a4",3),
+            ];
+            this.deck = buildDeck();
+            this.discard = [];
+            this.rno = 1;
+        }
+
+        function Player(name,ai){
+            this.name = name;
+            this.ai = ai; // 0 = player, 1= dumb, 2= less dumb, 3= hopefully not dumb anymore
+            this.life = 5;
+            this.hands = [];
+            this.stock = [];
+        }
+
+        function Round(){
+            console.log(_g.players);
+
+            console.log("Day " + _g.rno);
+            //Day Turn scavenge phase
+            for (var p of _g.players) {
+                new scavenge(p);
+            }
+
+            //Night Turn stockpiling, trading
+            console.log("Night " + _g.rno);
+
+
+            //END TURN
+            //spend 1 FOOD, 1 WATER, 1 AIR... Use a heart for every item you cannot pay.
+        }
+
+        function scavenge(p){
+            console.log(p.name + " goes out to scavenge")
+
+            while (p.hands.length < 5) {
+
+                let card = draw(_g.deck);
+
+                console.log("?")
+
+                if (card == "MONSTER") {
+                    //options: SHOOT - SPEND BULLET, FIGHT - USE HEART, ESCAPE - DROP A RANDOM CARD
+                    _g.discard.push(card);
+                } else {
+                    //just take it home with you
+                    //poison cards are visible for all players,
+                    p.hands.push(card);
+                }
+            }
+        }
+
+
+        function buildDeck(...ext){
+
+            var deck = [];
+
+            //base cards
+            let i=0;
+            while (i < 20){
+                deck.push("FOOD")
+                deck.push("WATER")
+                deck.push("AIR")
+                deck.push("JUNK")
+                i++;
+            }
+
+            i=0;
+            while (i < 10) {
+                deck.push("MONSTER")
+                deck.push("POISON")
+                deck.push("BULLET")
+                deck.push("ANTIDOTE")
+                i++;
+            }
+
+            shuffle(deck)
+
+            return deck;
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+</body>
+
+</html>
