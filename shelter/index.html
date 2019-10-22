@@ -9,12 +9,11 @@
 
         start();
 
-
         function start() {
             _g = new Game();
 
             // startup
-            // add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives food,
+            // add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives RATION,
             //
             // Escape - stop scavenging and run home
             //
@@ -22,16 +21,20 @@
             new Round();
         }
 
+
+        //AI MODE
+
         function Game(){
             console.log("new game starts");
             this.players = [
-                new Player("p1",0),
-                new Player("a2",1),
-                new Player("a3",2),
-                new Player("a4",3),
+                new Player("p1",1),
+                new Player("a2",2),
+                new Player("a3",3),
+                new Player("a4",4),
             ];
             this.deck = buildDeck();
             this.discard = [];
+            this.current = 0;
             this.rno = 1;
         }
 
@@ -40,7 +43,7 @@
             this.ai = ai; // 0 = player, 1= dumb, 2= less dumb, 3= hopefully not dumb anymore
             this.life = 5;
             this.hands = [];
-            this.stock = [];
+            this.stock = ["RATION","WATER","AIR"];
         }
 
         function Round(){
@@ -51,10 +54,23 @@
             //Day Turn scavenge phase
             for (var p of _g.players) {
 
+                _g.current = p;
+                if (p.ai > 0) {
+                    prepare(p);
 
-                //prepare(p) <-- allows players to move items between hands and stock pile...
-                scavenge(p);
+                }
+
+                console.log(p.name + " goes out to scavenge")
+                if (p.ai > 0) {
+                    while (p.hands.length < 5) {
+                        scavenge();
+                    }
+                } else {
+                    //show scavenge screen
+                }
             }
+
+            console.log(_g.players);
 
             //Night Turn trading
             console.log("Night " + _g.rno);
@@ -72,30 +88,58 @@
 
 
             //END TURN
-            //spend 1 FOOD, 1 WATER, 1 AIR... Use a heart for every item you cannot pay.
+            //spend 1 RATION, 1 WATER, 1 AIR... Use a heart for every item you cannot pay.
             //automatically remove items in stockpile first, then hands
             //Pay heart to remove poison, else it gets stuck in your hands
         }
 
-        function scavenge(p){
-            console.log(p.name + " goes out to scavenge")
-
-            while (p.hands.length < 5) {
-
-                let card = draw(_g.deck);
-
-                console.log("?")
-
-                if (card == "MONSTER") {
-                    //options: SHOOT - SPEND BULLET, FIGHT - USE HEART, ESCAPE - DROP A RANDOM CARD
-                    _g.discard.push(card);
-                } else {
-                    //just take it home with you
-                    //poison cards are visible for all players,
-                    p.hands.push(card);
-                }
-            }
+        function prepare(){
+            //todo
         }
+
+        function scavenge(){
+            let p = _g.current;
+            let card = draw(_g.deck);
+
+            if (card == "MONSTER") {
+                //options: SHOOT - SPEND BULLET, FIGHT - USE HEART, ESCAPE - DROP A RANDOM CARD
+                if (p.hands.indexOf("BULLET") >= 0){
+
+                    let bullet = p.hands.splice(p.hands.indexOf("BULLET"),1);
+                    //let bullet = find(p.hands,"BULLET");
+                    _g.discard.push(bullet);
+
+                    console.log(p.name + " shot a monster and killed it")
+
+                } else if (p.life <= 3 || p.hands >= 3) {
+
+                    let fell = drop(p.hands);
+                    _g.discard.push(fell);
+
+                    console.log(p.name + " saw a monster and runaway and dropped a " + fell);
+
+                } else {
+
+                    p.life--;
+                    console.log(p.name + " attacked a monster and got wounded during battle")
+
+                    if (p.hands < 0){
+                        console.log(p.name + " died");
+                    }
+
+                }
+                _g.discard.push(card);
+
+            } else {
+
+                console.log(p.name + " found " + card)
+                //just take it home with you
+                p.hands.push(card);
+
+            }
+
+        }
+
 
 
         function buildDeck(...ext){
@@ -105,15 +149,15 @@
             //base cards
             let i=0;
             while (i < 20){
-                deck.push("FOOD")
+                deck.push("RATION")
                 deck.push("WATER")
                 deck.push("AIR")
-                deck.push("PARTS")
                 i++;
             }
 
             i=0;
             while (i < 10) {
+                deck.push("PART")
                 deck.push("MONSTER")
                 deck.push("BULLET")
                 deck.push("POISON")
@@ -135,6 +179,16 @@
             return c;
         }
 
+        function drop(deck){
+            return deck.splice(roll(deck.length),1);
+        }
+
+        function find(deck,card){
+            return deck.splice(deck.indexOf(card),1);
+
+        }
+
+
         function shuffle(array) {
             for (var i = array.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
@@ -144,6 +198,21 @@
             }
         }
 
+
+
+        /*
+
+        Quick Play
+
+        Pass and Play
+
+        Compendium
+
+        Settings
+
+        Credits
+
+        */
     </script>
 </head>
 <body>
