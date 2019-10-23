@@ -3,7 +3,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
     <script>
-        //Working title: Scavenger Shuffle
+        //Working title: Song of Scavengers
+
+        const _needs = ["RATION","WATER","AIR"]
 
         var _g = {};
 
@@ -18,6 +20,7 @@
             // Escape - stop scavenging and run home
             //
 
+            deal(); //<-- deal starter cards depending on character
             new Round();
         }
 
@@ -38,12 +41,14 @@
             this.rno = 1;
         }
 
-        function Player(name,ai){
+        function Player(name,ai,hero){
             this.name = name;
             this.ai = ai; // 0 = player, 1= dumb, 2= less dumb, 3= hopefully not dumb anymore
+            this.hero = hero; // character type
             this.life = 5;
             this.hands = [];
-            this.stock = ["RATION","WATER","AIR"];
+            this.warning = [];
+            this.stock = [];
         }
 
         function Round(){
@@ -52,12 +57,14 @@
 
             console.log("Day " + _g.rno);
             //Day Turn scavenge phase
-            for (var p of _g.players) {
+            for (let p of _g.players) {
 
                 _g.current = p;
+                console.log(p.name + " is prepping")
                 if (p.ai > 0) {
-                    prepare(p);
-
+                    prepare();
+                } else {
+                    //show prepare screen
                 }
 
                 console.log(p.name + " goes out to scavenge")
@@ -74,6 +81,17 @@
 
             //Night Turn trading
             console.log("Night " + _g.rno);
+
+
+            for (let p of _g.players){
+
+                _g.current = p;
+                warn(p);
+
+
+            }
+
+
 
             //options: Trade, Trick, Threat, Transmute(special chars only)
 
@@ -93,8 +111,71 @@
             //Pay heart to remove poison, else it gets stuck in your hands
         }
 
+        function deal(){
+            //depend on each character, remove certain cards from the deck and deal as starter card
+            for (let p of _g.players){
+                let hero = p.hero
+
+                //just get random for now
+
+                let i = 0;
+                while (i<4) {
+                    let card = _needs[roll(3)];
+                    p.hands.push(card);
+                    i++;
+                }
+                console.log("" + p.hands);
+
+            }
+            shuffle(_g.deck);
+        }
+
+        function warn(){
+
+            let warning = [1,1,1];
+
+            let p = _g.current;
+
+            let i = 0;
+            while (i < 3){
+                for( let c of p.hands ){
+                    if (_needs[i] == c) {
+                        warning[i] = 0;
+                    }
+                }
+
+                for( let c of p.stock ){
+                    if (_needs[i] == c) {
+                        warning[i] = 0;
+                    }
+                }
+                i++;
+            }
+
+            p.warning = warning;
+        }
+
+
+        function isNeed(card){
+            if (_needs.indexOf(card) >= 0){
+                return true;
+            }
+            return false;
+        }
+
         function prepare(){
-            //todo
+            let p = _g.current;
+            for (let c of p.hands){
+                console.log("" + p.hands);
+                if (isNeed(c)){
+                    console.log(p.name + " put " + c +  " in stock")
+                    p.stock.push(c);
+                }
+            }
+        }
+
+        function trade(){
+
         }
 
         function scavenge(){
