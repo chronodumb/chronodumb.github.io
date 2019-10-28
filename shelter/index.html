@@ -21,7 +21,7 @@
             //
 
             deal(); //<-- deal starter cards depending on character
-            new Round();
+            round();
         }
 
 
@@ -51,13 +51,17 @@
             this.stock = [];
         }
 
-        function Round(){
+        function round(){
             console.log(_g.players);
 
 
             console.log("Day " + _g.rno);
             //Day Turn scavenge phase
             for (let p of _g.players) {
+
+                if (p.life <= 0){
+                    console.log(p.name + " is dead");
+                }
 
                 _g.current = p;
                 console.log(p.name + " is prepping")
@@ -85,13 +89,20 @@
 
             for (let p of _g.players){
 
+                if (p.life <= 0){
+                    console.log(p.name + " is dead");
+                }
+
                 _g.current = p;
                 warn(p);
-
-
+                trade(p);
+                spend(p);
             }
 
+            _g.rno++;
 
+            if (_g.rno < 5)
+                round()
 
             //options: Trade, Trick, Threat, Transmute(special chars only)
 
@@ -102,7 +113,6 @@
                 // resist- the target threatens you back.
                     //backout - cancel the threat. you don't get anything this turn
                     //fight. both you and target must pay a bullet. Anyone who cannot pay bullet must pay a heart
-
 
 
             //END TURN
@@ -176,6 +186,22 @@
 
         function trade(){
 
+        }
+
+        function spend(){
+            let p = _g.current;
+            let i = 0;
+            for (let w of p.warning){
+                if (w){
+                    console.log(p.name + " is missing " + _needs[i] + " and lost a life")
+                    p.life--;
+
+                    if (p.life <= 0){
+                        console.log(p.name + " died")
+                    }
+                }
+                i++;
+            }
         }
 
         function scavenge(){
