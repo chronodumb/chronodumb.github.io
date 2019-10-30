@@ -1,0 +1,12 @@
+auto battle,
+parts gacha,
+medabot like,
+
+core, head, r-arm, l-arm, body, feet,
+
+core - affinity, ultimate action
+head - passive action
+r-arm - offensive action
+l-arm - supportive action
+feet - defensive action
+
