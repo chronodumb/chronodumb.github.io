@@ -1,0 +1,347 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="../js/jquery.min.js"></script>
+
+    <script>
+        //Working title: Song of Scavengers
+
+        const _needs = ["FOOD","WATER","AIR"]
+
+        var _g = {};
+
+        $(document).ready(function(){
+           start();
+        });
+
+        function start() {
+            _g = new Game();
+
+            // startup
+            // add special characters... like starts with a weapon, or starts with an antidote, or every monster kill gives FOOD,
+            //
+            // Escape - stop scavenging and run home
+            //
+
+            deal(); //<-- deal starter cards depending on character
+
+
+            render();
+
+            round();
+        }
+
+
+        //AI MODE
+
+        function Game(){
+            console.log("new game starts");
+            this.players = [
+                new Player("p1",0),
+            ];
+            this.deck = buildDeck();
+            this.discard = [];
+            this.current = 0;
+            this.rno = 1;
+            this.round = "Preparing";
+
+        }
+
+        function Player(name,ai,hero){
+            this.name = name;
+            this.ai = ai; // 0 = player, 1= dumb, 2= less dumb, 3= hopefully not dumb anymore
+            this.hero = hero; // character type
+            this.life = 5;
+            this.hands = [];
+            this.warning = [];
+            this.stash = [];
+        }
+
+        function round(){
+            console.log(_g.players);
+
+
+            _g.round = ("Day " + _g.rno);
+            console.log(_g.round);
+            //Day Turn scavenge phase
+
+
+            //Night Turn trading
+            _g.round = ("Night " + _g.rno);
+            console.log(_g.round);
+
+
+
+            _g.rno++;
+
+            if (_g.rno < 5)
+                round()
+
+            //options: Trade, Trick, Threat, Transmute(special chars only)
+
+            //trade... example, p1 says, "I need water" then show your offer. every player must show their water and  trading is 1 is to 1 only.
+            //trick... you can ask for random item in exchange for another random item.
+            //threat... demand and item from a user and threaten to shoot.
+                // give in- the target gives you the item for free
+                // resist- the target threatens you back.
+                    //backout - cancel the threat. you don't get anything this turn
+                    //fight. both you and target must pay a bullet. Anyone who cannot pay bullet must pay a heart
+
+
+            //END TURN
+            //spend 1 FOOD, 1 WATER, 1 AIR... Use a heart for every item you cannot pay.
+            //automatically remove items in stashpile first, then hands
+            //Pay heart to remove poison, else it gets stuck in your hands
+        }
+
+        function deal(){
+            //depend on each character, remove certain cards from the deck and deal as starter card
+            for (let p of _g.players){
+                let hero = p.hero
+
+                //just get random for now
+
+                let i = 0;
+                while (i<3) {
+                    let card = _needs[roll(3)];
+                    card = find(_g.deck,card)
+                    p.hands.push(card);
+                    i++;
+                }
+                console.log("" + p.hands);
+
+            }
+            shuffle(_g.deck);
+        }
+
+        function warn(){
+
+            let warning = [1,1,1];
+
+            let p = _g.current;
+
+            let i = 0;
+            while (i < 3){
+                for( let c of p.hands ){
+                    if (_needs[i] == c) {
+                        warning[i] = 0;
+                    }
+                }
+
+                for( let c of p.stash ){
+                    if (_needs[i] == c) {
+                        warning[i] = 0;
+                    }
+                }
+                i++;
+            }
+
+            p.warning = warning;
+        }
+
+
+        function isNeed(card){
+            if (_needs.indexOf(card) >= 0){
+                return true;
+            }
+            return false;
+        }
+
+        function prepare(){
+            let p = _g.current;
+            for (let c of p.hands){
+                console.log("" + p.hands);
+                if (isNeed(c)){
+                    console.log(p.name + " put " + c +  " in stash")
+                    p.stash.push(c);
+                }
+            }
+        }
+
+        function trade(){
+
+        }
+
+        function spend(){
+            let p = _g.current;
+            let i = 0;
+            for (let w of p.warning){
+                if (w){
+                    console.log(p.name + " is missing " + _needs[i] + " and lost a life")
+                    p.life--;
+
+                    if (p.life <= 0){
+                        console.log(p.name + " died")
+                    }
+                }
+                i++;
+            }
+        }
+
+        function scavenge(){
+            let p = _g.current;
+            let card = draw(_g.deck);
+
+            if (card == "MONSTER") {
+                //options: SHOOT - SPEND BULLET, FIGHT - USE HEART, ESCAPE - DROP A RANDOM CARD
+                if (p.hands.indexOf("BULLET") >= 0){
+
+                    let bullet = p.hands.splice(p.hands.indexOf("BULLET"),1);
+                    //let bullet = find(p.hands,"BULLET");
+                    _g.discard.push(bullet);
+
+                    console.log(p.name + " shot a monster and killed it")
+
+                } else if (p.life <= 3 || p.hands >= 3) {
+
+                    let fell = drop(p.hands);
+                    _g.discard.push(fell);
+
+                    console.log(p.name + " saw a monster and runaway and dropped a " + fell);
+
+                } else {
+
+                    p.life--;
+                    console.log(p.name + " attacked a monster and got wounded during battle")
+
+                    if (p.hands < 0){
+                        console.log(p.name + " died");
+                    }
+
+                }
+                _g.discard.push(card);
+
+            } else {
+
+                console.log(p.name + " found " + card)
+                //just take it home with you
+                p.hands.push(card);
+
+            }
+
+        }
+
+        function render(){
+            $("#round").html(_g.round)
+            $("#deck").html("deck: " + _g.deck.length)
+
+            let c = _g.current;
+
+            //sort items
+
+
+            $("#life").html("life: " + _g.players[c].life);
+            $("#hands").html("hands: " + _g.players[c].hands);
+            $("#stash").html("stash: " + _g.players[c].stash);
+        }
+
+
+
+        function buildDeck(...ext){
+
+            var deck = [];
+
+            //base cards
+            let i=0;
+            while (i < 9){
+                deck.push("FOOD")
+                deck.push("WATER")
+                deck.push("AIR")
+                deck.push("GEAR")
+                i++;
+            }
+
+            i=0;
+            while (i < 6){
+                deck.push("BULLET")
+                deck.push("ANTIDOTE")
+                deck.push("MONSTER")
+                deck.push("POISON")
+                deck.push("MEDKIT")
+                i++;
+            }
+
+            i=0;
+            while (i < 3){
+                deck.push("BIG_MONSTER")
+                i++;
+            }
+
+            shuffle(deck)
+
+            return deck;
+        }
+
+        function roll(max){
+            return Math.floor(Math.random() * max);
+        }
+
+        function draw(deck){
+            let c = deck.shift();
+            return c;
+        }
+
+        function drop(deck){
+            return deck.splice(roll(deck.length),1);
+        }
+
+        function find(deck,card){
+            return deck.splice(deck.indexOf(card),1);
+
+        }
+
+
+        function shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+
+
+        /*
+
+        Quick Play
+
+        Pass and Play
+
+        Compendium
+
+        Settings
+
+        Credits
+
+        */
+    </script>
+    <style>
+        .move {display:none}
+        .field{height: 80px; padding-top:20px}
+    </style>
+</head>
+<body>
+
+    <div id="round">
+        day 1 - morning
+    </div>
+    <div id="life">
+        life:
+    </div>
+    <div id="deck">
+        deck - 50
+    </div>
+    <div class="field">
+        <span class="move shuffle">shuffling...</span>
+        <a class="move scavenge" href="#" onclick="scavenge()">scavenge</a>
+    </div>
+    <div id="hands">
+        hands:
+    </div>
+    <div id="stash">
+        stash:
+    </div>
+</body>
+
+</html>
