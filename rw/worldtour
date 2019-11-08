@@ -1,0 +1,56 @@
+12 - location
+6 - drivers
+
+each location has 4 colored routes with different numbers
+
+
+every location has 2 sides (different colors scheme)
+
+flip the card every time a driver land on that location
+
+every driver can only choose 2 out 4 possible color routes
+
+every driver has a starting location
+goal is to circumnavigate the world to return to that location in counter-clockwise (step right)
+
+
+
+starting a round
+
+players must either choose the driver they like or randomly select a driver
+
+shuffle the location cards. then spread it on the table in a circular manner
+
+
+drivers:
+
+rg,rb,ry,gb,gy,by
+
+r  g  b  y
+
+left   - right
+
+1R,2G, - 1B,2Y
+1G,2R, - 1B,2Y
+1B,2R, - 1G,2Y
+1R,2B, - 1G,2Y
+1G,2B, - 1R,2Y
+1B,2G, - 1R,2Y
+1B,2G, - 1Y,2R
+1G,2B, - 1Y,2R
+1Y,2B, - 1G,2R
+1B,2Y, - 1G,2R
+1G,2Y, - 1B,2R
+1Y,2G, - 1B,2R
+1Y,2R, - 1B,2G
+1R,2Y, - 1B,2G
+1B,2Y, - 1R,2G
+1Y,2B, - 1R,2G
+1R,2B, - 1Y,2G
+1B,2R, - 1Y,2G
+1G,2R, - 1Y,2B
+1R,2G, - 1Y,2B
+1Y,2G, - 1R,2B
+1G,2Y, - 1R,2B
+1R,2Y, - 1G,2B
+1Y,2R, - 1G,2B
