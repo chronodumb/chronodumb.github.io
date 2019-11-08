@@ -1,0 +1,57 @@
+Components:
+
+Six by six playing grid. Numbers 1 to 6 for x and y coordinates
+
+three dice with one die of different color than the rest.
+
+the different colored die is the score, while the two same colored dice is position
+
+Solitaire
+
+roll all the die.
+
+plot the score into the grid by using the value of the position dice
+
+choose which value of position dice should be used as x and y and find the plot on the grid
+
+if the plot is already taken, then you are forced to overwrite it
+
+rolling a trio (all dice have same value) allows you to choose any empty plot and put whatever the score.
+
+the game ends as soon as all plots are filled out
+
+
+scoring:
+
+look for the following combination of numbers in either horizontal or vertical and add then add these scores
+
+trio - 3 pts
+quad - 4 pts
+fiver - 5 pts
+fullhouse - 5pts
+straight (1,2,3,4,5) - 5pts
+fullstraight (1,2,3,4,5,6) - 10pts
+
+count all the numbers that does not form a combo and subtract it to your total points
+
+
+subtract the total number of your rolls
+
+
+Vs Mode
+
+player must use different colored pens for marking the score
+
+roll all the die.
+
+plot the score into the grid by using the value of the position dice
+
+choose which value of position dice should be used as x and y and find the plot on the grid
+
+if the plot is already taken, then you are forced to overwrite it
+
+
+
+
+
+
